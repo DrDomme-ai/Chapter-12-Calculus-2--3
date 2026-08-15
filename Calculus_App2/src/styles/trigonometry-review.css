@@ -1,0 +1,75 @@
+.trig-review-page { --trig-angle: var(--warning, #c58a32); }
+.trig-review-toolbar { align-items: center; }
+.trig-breadcrumb { align-items: center; }
+.trig-breadcrumb > span { color: var(--algebra-muted); }
+.trig-breadcrumb > strong { color: var(--algebra-primary); font-size: .88rem; }
+.trig-toolbar-actions { justify-content: flex-end; }
+.trig-review-hero h1 { font-size: clamp(3.6rem, 9vw, 7.4rem); }
+.trig-review-hero .algebra-progression { margin-bottom: clamp(35px, 6vw, 65px); }
+
+.trig-why-calculus,
+.trig-overview-content { width: min(1160px, calc(100% - 40px)); margin-inline: auto; }
+.trig-why-calculus { margin-top: 30px; padding: clamp(30px, 5vw, 50px); display: grid; grid-template-columns: minmax(240px, .7fr) minmax(0, 1.3fr); gap: 22px 44px; align-items: center; border: 1px solid var(--algebra-line); border-left: 6px solid var(--trig-angle); border-radius: 20px; background: var(--algebra-surface); box-shadow: 0 18px 48px rgba(16,42,54,.07); }
+.trig-why-calculus h2 { margin: 8px 0 0; font-size: clamp(1.9rem, 4vw, 3rem); letter-spacing: -.045em; }
+.trig-why-calculus > p { margin: 0; color: var(--algebra-muted); font-size: 1.06rem; line-height: 1.75; }
+.trig-why-calculus > .math-display { grid-column: 1 / -1; margin: 8px 0 0; padding: 18px; border-radius: 12px; background: var(--algebra-soft); }
+.trig-review-overview > div > .primary-button { margin-top: 24px; }
+
+.trig-overview-content { padding-bottom: 80px; }
+.trig-learning-sequence,
+.trig-module-map,
+.trig-progress-card { padding: clamp(55px, 8vw, 90px) 0; border-bottom: 1px solid var(--algebra-line); }
+.trig-learning-sequence h2,
+.trig-module-map h2,
+.trig-progress-card h2 { margin: 8px 0 25px; font-size: clamp(2.15rem, 5vw, 3.7rem); letter-spacing: -.05em; }
+.trig-learning-sequence ol { margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 9px; list-style: none; }
+.trig-learning-sequence li { min-width: 0; padding: 18px 12px; display: grid; gap: 10px; border: 1px solid var(--algebra-line); border-radius: 12px; background: var(--algebra-surface); }
+.trig-learning-sequence li span { color: var(--algebra-accent); font-size: .7rem; font-weight: 900; letter-spacing: .1em; }
+.trig-learning-sequence li strong { color: var(--algebra-primary); font-size: .83rem; line-height: 1.35; }
+.trig-module-map > header { margin-bottom: 30px; display: grid; grid-template-columns: minmax(0,1fr) minmax(280px,.75fr); gap: 32px; align-items: end; }
+.trig-module-map > header h2 { margin-bottom: 0; }
+.trig-module-map > header > p { margin: 0; color: var(--algebra-muted); line-height: 1.7; }
+.trig-module-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; }
+.trig-module-grid article { min-width: 0; min-height: 210px; padding: 24px; border: 1px solid var(--algebra-line); border-radius: 15px; background: var(--algebra-surface); }
+.trig-module-grid article.is-available { border-color: var(--algebra-accent); box-shadow: inset 0 4px 0 var(--algebra-accent); }
+.trig-module-grid article > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.trig-module-grid article > div span { color: var(--algebra-accent); font-size: .73rem; font-weight: 900; letter-spacing: .1em; }
+.trig-module-grid article > div small { padding: 5px 8px; border-radius: 99px; background: var(--algebra-soft); color: var(--algebra-primary); font-size: .64rem; font-weight: 900; text-transform: uppercase; }
+.trig-module-grid h3 { margin: 25px 0 10px; color: var(--algebra-primary); font-size: 1.25rem; }
+.trig-module-grid p { margin: 0; color: var(--algebra-muted); line-height: 1.65; }
+.trig-module-grid article > .secondary-button { margin-top: 22px; }
+.trig-module-status { display: inline-block; margin-top: 22px; color: var(--algebra-muted); font-size: .7rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+
+.trig-progress-card { display: grid; grid-template-columns: minmax(0,1fr) minmax(230px,.5fr) auto; gap: 30px; align-items: center; }
+.trig-progress-card h2 { margin-bottom: 8px; }
+.trig-progress-card > div:first-child > p:last-child { margin: 0; max-width: 620px; color: var(--algebra-muted); line-height: 1.65; }
+.trig-progress-measure { padding: 19px; display: grid; gap: 8px; border-radius: 13px; background: var(--algebra-soft); }
+.trig-progress-measure strong { color: var(--algebra-accent); font-size: 1.9rem; }
+.trig-progress-measure progress { width: 100%; accent-color: var(--algebra-accent); }
+.trig-progress-measure span { color: var(--algebra-muted); font-size: .75rem; font-weight: 800; }
+.trig-topic-navigation { padding: 30px 0 0; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+.trig-topic-navigation button { min-width: 0; padding: 17px; display: grid; gap: 6px; border: 1px solid var(--algebra-line); border-radius: 11px; background: var(--algebra-surface); color: var(--algebra-primary); text-align: left; cursor: pointer; }
+.trig-topic-navigation button span { color: var(--algebra-muted); font-size: .67rem; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; }
+
+@media (max-width: 900px) {
+  .trig-why-calculus,
+  .trig-module-map > header,
+  .trig-progress-card { grid-template-columns: 1fr; }
+  .trig-learning-sequence ol { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .trig-module-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .trig-progress-card > .primary-button { justify-self: start; }
+}
+
+@media (max-width: 620px) {
+  .trig-review-toolbar { align-items: stretch; }
+  .trig-breadcrumb,
+  .trig-toolbar-actions { width: 100%; }
+  .trig-toolbar-actions { display: grid !important; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .trig-why-calculus,
+  .trig-overview-content { width: min(100% - 22px,1160px); }
+  .trig-review-hero h1 { overflow-wrap: anywhere; font-size: clamp(3rem, 15vw, 4.7rem); }
+  .trig-learning-sequence ol,
+  .trig-module-grid,
+  .trig-topic-navigation { grid-template-columns: 1fr; }
+  .trig-progress-card > .primary-button { width: 100%; }
+}

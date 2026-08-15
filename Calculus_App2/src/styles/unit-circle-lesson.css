@@ -1,0 +1,228 @@
+.unit-circle-lesson-page {
+  min-width: 0;
+}
+
+.unit-circle-lesson-hero {
+  background:
+    radial-gradient(circle at 82% 20%, rgba(117, 221, 212, .2), transparent 25%),
+    linear-gradient(125deg, var(--algebra-primary), #18585d);
+}
+
+.unit-coordinate-definitions {
+  margin: 20px 0 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.unit-coordinate-definitions div {
+  min-width: 0;
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--algebra-soft);
+}
+
+.unit-coordinate-definitions dt {
+  color: var(--algebra-muted);
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.unit-coordinate-definitions dd {
+  margin: 8px 0 0;
+  color: var(--algebra-primary);
+  font-weight: 900;
+}
+
+.unit-calculus-connection {
+  margin-top: 20px;
+  padding: clamp(22px, 4vw, 34px);
+  border-left: 5px solid var(--warning);
+  border-radius: 0 15px 15px 0;
+  background: var(--algebra-surface);
+}
+
+.unit-calculus-connection p:last-child {
+  max-width: 880px;
+  margin-bottom: 0;
+  color: var(--algebra-muted);
+  line-height: 1.72;
+}
+
+.unit-coordinate-proof {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.unit-coordinate-proof article {
+  min-width: 0;
+  padding: clamp(20px, 3vw, 29px);
+  border: 1px solid var(--algebra-line);
+  border-radius: 15px;
+  background: var(--algebra-surface);
+}
+
+.unit-coordinate-proof article > span {
+  color: var(--algebra-accent);
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.unit-coordinate-proof p {
+  min-height: 3.2em;
+  color: var(--algebra-muted);
+  line-height: 1.6;
+}
+
+.unit-coordinate-proof .math-display {
+  margin-bottom: 0;
+  padding: 12px 5px;
+  border-radius: 9px;
+  background: var(--algebra-soft);
+}
+
+.unit-quadrant-note {
+  margin: 18px 0 0;
+  padding: 16px 18px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent-light) 15%, var(--surface));
+  color: var(--algebra-primary);
+  font-weight: 700;
+  line-height: 1.65;
+}
+
+.unit-angle-table-region {
+  max-width: 100%;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  border: 1px solid var(--algebra-line);
+  border-radius: 15px;
+  background: var(--algebra-surface);
+  overscroll-behavior-inline: contain;
+}
+
+.unit-angle-table-region:focus-visible {
+  outline: 3px solid var(--algebra-accent);
+  outline-offset: 3px;
+}
+
+.unit-angle-table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.unit-angle-table caption {
+  padding: 20px;
+  color: var(--algebra-primary);
+  font-size: 1.05rem;
+  font-weight: 900;
+  text-align: left;
+}
+
+.unit-angle-table th,
+.unit-angle-table td {
+  padding: 13px 16px;
+  border-top: 1px solid var(--algebra-line);
+}
+
+.unit-angle-table thead th {
+  background: var(--algebra-primary);
+  color: white;
+  font-size: .73rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.unit-angle-table tbody th {
+  background: var(--algebra-soft);
+  color: var(--algebra-primary);
+}
+
+.unit-angle-table tbody tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--algebra-soft) 55%, var(--algebra-surface));
+}
+
+.unit-angle-table td:nth-child(3) {
+  min-width: 135px;
+  color: var(--algebra-muted);
+  font-size: .82rem;
+  font-weight: 750;
+}
+
+.unit-practice-solution {
+  display: grid;
+  gap: 10px;
+}
+
+.unit-practice-solution > p {
+  color: var(--algebra-muted);
+  line-height: 1.6;
+}
+
+.unit-practice-solution > div {
+  padding: 13px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, .6);
+}
+
+.unit-practice-solution > div > p {
+  color: var(--algebra-muted);
+}
+
+.unit-practice-solution .math-display {
+  margin: 8px 0 0;
+}
+
+.unit-mistake-grid {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.unit-mistake-grid .trig-lesson-mistake {
+  margin-top: 0;
+}
+
+@media (max-width: 900px) {
+  .unit-coordinate-proof {
+    grid-template-columns: 1fr;
+  }
+
+  .unit-coordinate-proof p {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 650px) {
+  .unit-coordinate-definitions,
+  .unit-mistake-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .unit-angle-table-region::after {
+    content: 'Swipe horizontally to see every exact value';
+    position: sticky;
+    left: 0;
+    display: block;
+    width: max-content;
+    padding: 9px 13px;
+    color: var(--algebra-muted);
+    font-size: .72rem;
+    font-weight: 800;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .unit-circle-lesson-page *,
+  .unit-circle-lesson-page *::before,
+  .unit-circle-lesson-page *::after {
+    scroll-behavior: auto !important;
+  }
+}

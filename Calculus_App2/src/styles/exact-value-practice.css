@@ -1,0 +1,198 @@
+.trig-exact-practice {
+  --trig-exact-surface: var(--surface, #fffefa);
+  --trig-exact-ink: var(--text-primary, #102a36);
+  --trig-exact-primary: var(--primary, #123f4c);
+  --trig-exact-accent: var(--accent, #00877f);
+  --trig-exact-line: var(--border, #d3dedf);
+  --trig-exact-muted: var(--text-secondary, #64757d);
+  --trig-exact-success: var(--success, #397a63);
+  --trig-exact-warning: var(--warning, #c58a32);
+  min-width: 0;
+  margin-top: 20px;
+  padding: clamp(23px, 4vw, 38px);
+  border: 1px solid var(--trig-exact-line);
+  border-top: 4px solid var(--trig-exact-accent);
+  border-radius: 18px;
+  background: var(--trig-exact-surface);
+  color: var(--trig-exact-ink);
+  box-shadow: 0 15px 42px rgba(16, 42, 54, .06);
+}
+
+.trig-exact-practice-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.trig-exact-label {
+  margin: 0;
+  color: var(--trig-exact-accent);
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.trig-exact-practice-heading h3 {
+  margin: 8px 0 9px;
+  color: var(--trig-exact-ink);
+  font-size: clamp(1.45rem, 3vw, 2.15rem);
+  letter-spacing: -.035em;
+}
+
+.trig-exact-practice-heading p:last-child {
+  max-width: 720px;
+  margin-bottom: 0;
+  color: var(--trig-exact-muted);
+  line-height: 1.65;
+}
+
+.trig-exact-practice-heading > span {
+  flex: 0 0 auto;
+  padding: 8px 11px;
+  border-radius: 99px;
+  background: #e6f2ef;
+  color: var(--trig-exact-accent);
+  font-size: .76rem;
+  font-weight: 900;
+}
+
+.trig-exact-prompt {
+  margin: 25px 0 20px;
+  padding: 20px;
+  border-radius: 13px;
+  background: #edf6f3;
+  text-align: center;
+}
+
+.trig-exact-prompt > span {
+  color: var(--trig-exact-muted);
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.trig-exact-prompt .math-display {
+  margin: 12px 0 0;
+  font-size: 1.22rem;
+}
+
+.trig-exact-answer {
+  max-width: 480px;
+  display: grid;
+  gap: 8px;
+  color: var(--trig-exact-primary);
+  font-weight: 800;
+}
+
+.trig-exact-answer input {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 13px;
+  border: 1px solid var(--trig-exact-line);
+  border-radius: 9px;
+  background: white;
+  color: var(--trig-exact-ink);
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.trig-exact-answer input[aria-invalid='true'] { border-color: var(--trig-exact-warning); }
+.trig-exact-answer small { color: var(--trig-exact-muted); font-weight: 600; line-height: 1.45; }
+
+.trig-exact-actions {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.trig-exact-actions button {
+  min-height: 42px;
+  padding: 10px 14px;
+  border: 1px solid var(--trig-exact-line);
+  border-radius: 9px;
+  background: white;
+  color: var(--trig-exact-primary);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.trig-exact-actions .trig-exact-primary {
+  border-color: var(--trig-exact-accent);
+  background: var(--trig-exact-accent);
+  color: white;
+}
+
+.trig-exact-actions .trig-exact-quiet { border-color: transparent; background: transparent; color: var(--trig-exact-muted); }
+.trig-exact-actions button:hover:not(:disabled):not(.trig-exact-primary) { background: #edf6f3; }
+.trig-exact-actions button:disabled { opacity: .5; cursor: not-allowed; }
+
+.trig-exact-feedback,
+.trig-exact-hint,
+.trig-exact-solution {
+  margin: 16px 0 0;
+  padding: 15px 18px;
+  border-radius: 9px;
+}
+
+.trig-exact-feedback { font-weight: 800; }
+.trig-exact-feedback.is-correct { background: #e4f2eb; color: var(--trig-exact-success); }
+.trig-exact-feedback.is-incorrect { background: #fff1df; color: #79501a; }
+.trig-exact-hint { border-left: 4px solid var(--trig-exact-warning); background: #fff8e9; }
+.trig-exact-hint p,
+.trig-exact-solution p { margin-bottom: 0; color: var(--trig-exact-muted); line-height: 1.62; }
+
+.trig-exact-circle-clue {
+  margin: 18px 0 0;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: minmax(230px, 360px) minmax(220px, 1fr);
+  align-items: center;
+  gap: 20px;
+  border: 1px solid var(--trig-exact-line);
+  border-radius: 14px;
+  background: #f8faf8;
+}
+
+.trig-exact-circle-clue svg { width: 100%; height: auto; display: block; }
+.trig-exact-axis { stroke: #82969a; stroke-width: 1.7; }
+.trig-exact-axis-arrow { fill: #82969a; }
+.trig-exact-unit-circle { fill: rgba(117, 221, 212, .08); stroke: var(--trig-exact-primary); stroke-width: 2.5; }
+.trig-exact-radius { stroke: var(--trig-exact-warning); stroke-width: 3.5; }
+.trig-exact-coordinate-guide { stroke: var(--trig-exact-accent); stroke-width: 2; stroke-dasharray: 6 5; }
+.trig-exact-angle-arc { fill: none; stroke: var(--trig-exact-warning); stroke-width: 2.5; }
+.trig-exact-reference-point { fill: var(--trig-exact-accent); stroke: white; stroke-width: 3; }
+.trig-exact-point-label,
+.trig-exact-axis-label,
+.trig-exact-origin-label,
+.trig-exact-angle-label { fill: var(--trig-exact-primary); font: 800 14px 'DM Sans', system-ui, sans-serif; }
+.trig-exact-angle-label { fill: #845817; }
+.trig-exact-circle-clue figcaption { color: var(--trig-exact-muted); line-height: 1.62; }
+.trig-exact-circle-clue figcaption span { display: block; margin-bottom: 6px; color: var(--trig-exact-accent); font-size: .72rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+
+.trig-exact-solution { border-left: 4px solid var(--trig-exact-success); background: #e8f3ed; }
+.trig-exact-solution-equation { margin: 14px 0; display: flex; flex-wrap: wrap; align-items: center; gap: 11px; color: var(--trig-exact-primary); font-size: 1.16rem; }
+.trig-exact-solution-equation > span { font-weight: 900; }
+
+@media (max-width: 700px) {
+  .trig-exact-practice-heading { flex-direction: column; }
+  .trig-exact-circle-clue { grid-template-columns: 1fr; }
+  .trig-exact-circle-clue svg { max-width: 360px; margin-inline: auto; }
+}
+
+@media (max-width: 430px) {
+  .trig-exact-practice { padding: 20px 16px; }
+  .trig-exact-actions > button { flex: 1 1 calc(50% - 8px); }
+  .trig-exact-actions .trig-exact-primary,
+  .trig-exact-actions .trig-exact-quiet { flex-basis: 100%; }
+  .trig-exact-circle-clue { padding: 10px; }
+  .trig-exact-prompt .math-display { font-size: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trig-exact-practice * { scroll-behavior: auto; transition: none !important; }
+}

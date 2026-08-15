@@ -1,0 +1,407 @@
+.angle-radians-explorer {
+  min-width: 0;
+  padding: clamp(20px, 3vw, 34px);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: 0 16px 42px rgba(16, 42, 54, 0.08);
+  color: var(--text-primary);
+}
+
+.angle-radians-explorer *,
+.angle-radians-explorer *::before,
+.angle-radians-explorer *::after {
+  box-sizing: border-box;
+}
+
+.angle-radians-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 24px;
+}
+
+.angle-radians-heading h3 {
+  margin: 7px 0 8px;
+  color: var(--primary);
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  line-height: 1.12;
+}
+
+.angle-radians-heading p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.angle-radians-equivalence {
+  max-width: 330px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent-light) 13%, var(--surface));
+  color: var(--primary);
+  font-weight: 750;
+  text-align: center;
+}
+
+.angle-radians-display-controls {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.angle-radians-display-controls button,
+.angle-animation-controls button,
+.angle-special-angles button {
+  min-height: 44px;
+  padding: 9px 13px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--primary);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.angle-radians-display-controls button:hover,
+.angle-animation-controls button:hover,
+.angle-special-angles button:hover {
+  border-color: var(--accent);
+}
+
+.angle-radians-display-controls button:focus-visible,
+.angle-animation-controls button:focus-visible,
+.angle-special-angles button:focus-visible,
+.angle-circle-svg:focus-visible,
+.angle-primary-control input:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-light) 68%, white);
+  outline-offset: 2px;
+}
+
+.angle-radians-display-controls button.active,
+.angle-animation-controls button.active,
+.angle-animation-controls button[aria-pressed='true'],
+.angle-special-angles button.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: white;
+}
+
+.angle-radians-display-controls .angle-reset-button {
+  margin-left: auto;
+  border-color: color-mix(in srgb, var(--warning) 48%, var(--border));
+}
+
+.angle-radians-workspace {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: minmax(300px, 1.15fr) minmax(270px, 0.85fr);
+  gap: 22px;
+}
+
+.angle-circle-panel,
+.angle-control-panel {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--background) 70%, var(--surface));
+}
+
+.angle-circle-panel {
+  padding: clamp(10px, 2vw, 20px);
+}
+
+.angle-circle-svg {
+  display: block;
+  width: min(100%, 520px);
+  height: auto;
+  margin: 0 auto;
+  border-radius: 12px;
+  touch-action: none;
+  cursor: crosshair;
+  user-select: none;
+}
+
+.angle-circle-ring {
+  fill: rgba(255, 255, 255, 0.78);
+  stroke: var(--primary);
+  stroke-width: 2.2;
+}
+
+.angle-circle-axis {
+  stroke: var(--text-secondary);
+  stroke-width: 1.2;
+  opacity: 0.55;
+}
+
+.angle-start-radius {
+  stroke: var(--text-secondary);
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+}
+
+.angle-sector,
+.angle-sector-full {
+  fill: color-mix(in srgb, var(--warning) 18%, transparent);
+  stroke: color-mix(in srgb, var(--warning) 80%, var(--primary));
+  stroke-width: 1.4;
+}
+
+.angle-growing-arc {
+  fill: none;
+  stroke: var(--warning);
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
+.angle-rotating-radius {
+  stroke: var(--accent);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.angle-drag-handle {
+  fill: var(--accent);
+  stroke: white;
+  stroke-width: 4;
+}
+
+.angle-origin {
+  fill: var(--primary);
+}
+
+.angle-circle-svg text {
+  fill: var(--text-secondary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  pointer-events: none;
+}
+
+.angle-circle-svg .angle-radius-label {
+  fill: var(--accent);
+  font-size: 17px;
+}
+
+.angle-circle-svg .angle-arc-label {
+  fill: color-mix(in srgb, var(--warning) 78%, var(--primary));
+  font-size: 14px;
+}
+
+.angle-interaction-note {
+  margin: 8px auto 0;
+  max-width: 580px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.angle-control-panel {
+  padding: clamp(18px, 2.5vw, 26px);
+  display: grid;
+  align-content: start;
+  gap: 20px;
+}
+
+.angle-primary-control {
+  display: grid;
+  gap: 9px;
+}
+
+.angle-primary-control label {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.angle-primary-control label strong {
+  color: var(--primary);
+}
+
+.angle-primary-control input {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.angle-animation-controls {
+  padding-top: 2px;
+  display: grid;
+  gap: 9px;
+}
+
+.angle-animation-controls > button {
+  border-color: var(--accent);
+  background: var(--primary);
+  color: white;
+}
+
+.angle-animation-controls > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.angle-animation-controls button:disabled {
+  opacity: 0.52;
+  cursor: not-allowed;
+}
+
+.angle-motion-note {
+  margin: -8px 0 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--warning);
+  background: color-mix(in srgb, var(--warning) 9%, var(--surface));
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.angle-special-angles {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.angle-special-angles > span {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.angle-special-angles > div {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.angle-special-angles button {
+  min-width: 0;
+  padding-inline: 6px;
+  font-size: 0.72rem;
+}
+
+.angle-readout-grid {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.angle-readout-grid > div {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  display: grid;
+  gap: 7px;
+}
+
+.angle-readout-grid > div > span {
+  color: var(--text-secondary);
+  font-size: 0.69rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.angle-readout-grid strong {
+  min-width: 0;
+  color: var(--primary);
+  font-size: clamp(1.1rem, 2.5vw, 1.45rem);
+  overflow-x: auto;
+}
+
+.angle-readout-grid small {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.angle-readout-grid .angle-arc-readout {
+  border-color: color-mix(in srgb, var(--warning) 45%, var(--border));
+  background: color-mix(in srgb, var(--warning) 7%, var(--surface));
+}
+
+.angle-radian-why {
+  margin-top: 16px;
+  padding: 18px 20px;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 12px 12px 0;
+  background: color-mix(in srgb, var(--accent-light) 11%, var(--surface));
+}
+
+.angle-radian-why p {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+@media (max-width: 900px) {
+  .angle-radians-heading,
+  .angle-radians-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .angle-radians-equivalence {
+    max-width: none;
+  }
+
+  .angle-readout-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .angle-radians-explorer {
+    padding: 16px;
+    border-radius: 15px;
+  }
+
+  .angle-radians-display-controls button {
+    flex: 1 1 calc(50% - 8px);
+  }
+
+  .angle-radians-display-controls .angle-reset-button {
+    margin-left: 0;
+  }
+
+  .angle-circle-panel {
+    padding: 5px;
+  }
+
+  .angle-interaction-note {
+    padding-inline: 8px;
+  }
+
+  .angle-special-angles > div {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .angle-readout-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .angle-radians-explorer *,
+  .angle-radians-explorer *::before,
+  .angle-radians-explorer *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}

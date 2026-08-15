@@ -1,0 +1,72 @@
+.angles-radians-page { min-width: 0; }
+.angles-radians-toolbar { position: sticky; top: 0; z-index: 20; }
+.angles-radians-hero { padding: clamp(38px, 6vw, 75px) max(5vw, calc((100% - 1160px) / 2)); background: radial-gradient(circle at 85% 18%, rgba(117,221,212,.18),transparent 25%), linear-gradient(125deg,var(--algebra-primary),#18585d); color: white; }
+.angles-radians-hero-grid { display: grid; grid-template-columns: minmax(0,1fr) 250px; align-items: end; gap: clamp(35px,7vw,80px); }
+.angles-radians-hero h1 { max-width: 900px; margin: 12px 0 20px; color: white; font-size: clamp(3.5rem,9vw,7.4rem); line-height: .88; letter-spacing: -.07em; }
+.angles-radians-hero-grid > div > p:not(.card-label) { max-width: 780px; color: #d7e5e7; font-size: 1.08rem; line-height: 1.75; }
+.angles-radians-hero aside { min-height: 245px; padding: 27px; display: grid; align-content: center; gap: 9px; border: 1px solid rgba(255,255,255,.25); border-radius: 18px; background: rgba(255,255,255,.07); }
+.angles-radians-hero aside span { color: var(--accent-light); font-size: .72rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.angles-radians-hero aside strong { color: white; font-size: 3.2rem; }
+.angles-radians-hero aside progress { width: 100%; accent-color: var(--accent-light); }
+.angles-radians-hero aside p { margin: 5px 0 0; color: #d7e5e7; font-size: .84rem; line-height: 1.55; }
+.angles-radians-hero-actions { margin-top: 25px; display: flex; flex-wrap: wrap; gap: 10px; }
+.angles-radians-hero-actions .secondary-button { border-color: rgba(255,255,255,.65); background: transparent; color: white; }
+.angles-radians-section-nav { width: min(1160px,calc(100% - 40px)); margin: 26px auto 0; padding: 12px; display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 7px; border: 1px solid var(--algebra-line); border-radius: 15px; background: var(--algebra-surface); }
+.angles-radians-section-nav button { min-width: 0; padding: 11px 8px; display: grid; gap: 5px; border: 0; border-radius: 9px; background: transparent; color: var(--algebra-primary); font-weight: 800; cursor: pointer; }
+.angles-radians-section-nav button:hover { background: var(--algebra-soft); }
+.angles-radians-section-nav span { color: var(--algebra-accent); font-size: .66rem; letter-spacing: .1em; }
+.angles-radians-content { width: min(1160px,calc(100% - 40px)); margin-inline: auto; }
+.angles-radians-section { padding: clamp(65px,9vw,108px) 0; border-bottom: 1px solid var(--algebra-line); scroll-margin-top: 75px; }
+.angles-definition-grid,.angles-formula-grid { margin-bottom: 20px; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 15px; }
+.angles-direction-list { margin: 22px 0 0; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+.angles-direction-list div { padding: 14px; border-radius: 10px; background: var(--algebra-soft); }
+.angles-direction-list dt { color: var(--algebra-muted); font-size: .7rem; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; }
+.angles-direction-list dd { margin: 6px 0 0; color: var(--algebra-primary); font-weight: 900; }
+.angles-equivalence-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+.angles-equivalence-grid article { min-width: 0; padding: 22px; border: 1px solid var(--algebra-line); border-radius: 14px; background: var(--algebra-surface); text-align: center; }
+.angles-equivalence-grid article > span { color: var(--algebra-accent); font-size: 1.7rem; font-weight: 900; }
+.angles-equivalence-grid .math-display { margin: 12px 0; font-size: .88rem; }
+.angles-revolution-value { margin: 0; padding-top: 10px; border-top: 1px solid var(--algebra-line); }
+.angles-why-card { margin-top: 20px; padding: clamp(25px,4vw,38px); border-left: 5px solid var(--warning); border-radius: 15px; background: var(--algebra-surface); }
+.angles-why-card h3 { margin: 8px 0; font-size: clamp(1.5rem,3vw,2.15rem); }
+.angles-why-card p:not(.card-label) { color: var(--algebra-muted); line-height: 1.7; }
+.angles-calculus-card { padding: clamp(25px,5vw,45px); display: grid; grid-template-columns: minmax(0,1fr) minmax(300px,.8fr); gap: 30px; border-radius: 19px; background: var(--algebra-primary); color: white; }
+.angles-calculus-card > * { min-width: 0; }
+.angles-calculus-card p { color: #d5e4e5; line-height: 1.72; }
+.angles-calculus-card .math-display { padding: 14px; border-radius: 9px; background: rgba(255,255,255,.08); color: white; }
+.angles-calculus-card details { margin-top: 12px; padding: 15px; border: 1px solid rgba(255,255,255,.2); border-radius: 10px; }
+.angles-calculus-card summary { cursor: pointer; font-weight: 800; }
+.angles-example-grid { display: grid; gap: 16px; }
+.angles-example-grid .trig-lesson-example { margin-top: 0; }
+.angles-practice-solution { display: grid; gap: 10px; }
+.angles-practice-solution > p { color: var(--algebra-muted); line-height: 1.6; }
+.angles-practice-solution > div { padding: 13px; border-radius: 9px; background: rgba(255,255,255,.6); }
+.angles-practice-solution .math-display { margin: 8px 0 0; }
+.angles-saved-message { padding: 13px 16px; border-radius: 9px; background: #e4f2eb; color: var(--success); font-weight: 900; }
+.angles-concept-grid { margin-top: 20px; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+.angles-concept-grid .trig-lesson-concept-check { margin-top: 0; }
+.angles-summary-card { margin-top: 20px; padding: clamp(25px,5vw,45px); display: grid; grid-template-columns: minmax(0,1fr) minmax(300px,.75fr); gap: 30px; border-radius: 18px; background: var(--algebra-soft); }
+.angles-summary-card h3 { margin: 8px 0; font-size: clamp(1.7rem,4vw,2.7rem); }
+.angles-summary-card ul { padding-left: 20px; color: var(--algebra-muted); line-height: 1.75; }
+.angles-summary-card .math-display { margin: 8px 0; padding: 9px; border-radius: 8px; background: var(--algebra-surface); font-size: .9rem; }
+.angles-next-actions { margin-top: 22px; display: flex; justify-content: space-between; gap: 12px; }
+.angles-next-actions button { min-height: 45px; padding: 11px 15px; border: 1px solid var(--algebra-accent); border-radius: 9px; background: var(--algebra-surface); color: var(--algebra-primary); font-weight: 900; cursor: pointer; }
+.angles-next-actions button:last-child { background: var(--algebra-accent); color: white; }
+@media (max-width: 900px) {
+  .angles-radians-hero-grid,.angles-calculus-card,.angles-summary-card { grid-template-columns: 1fr; }
+  .angles-definition-grid,.angles-formula-grid,.angles-direction-list { grid-template-columns: 1fr; }
+  .angles-radians-hero aside { width: min(100%,430px); min-height: 180px; }
+  .angles-radians-section-nav { grid-template-columns: repeat(4,minmax(0,1fr)); }
+  .angles-concept-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 650px) {
+  .angles-radians-toolbar { position: static; align-items: stretch; flex-direction: column; }
+  .angles-radians-toolbar > div { display: grid; grid-template-columns: 1fr; }
+  .angles-radians-toolbar button { text-align: left; }
+  .angles-radians-hero h1 { font-size: clamp(3.1rem,14vw,4.7rem); overflow-wrap: anywhere; }
+  .angles-radians-section-nav { width: min(100% - 22px,1160px); grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .angles-radians-content { width: min(100% - 22px,1160px); }
+  .angles-definition-grid,.angles-formula-grid,.angles-equivalence-grid,.angles-direction-list { grid-template-columns: 1fr; }
+  .angles-next-actions { flex-direction: column; }
+  .angles-next-actions button { width: 100%; }
+}

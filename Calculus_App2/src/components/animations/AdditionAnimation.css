@@ -1,0 +1,546 @@
+.number-system-demo {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px;
+  color: #102a36;
+}
+
+.number-system-header {
+  margin-bottom: 30px;
+}
+
+.number-system-header h2 {
+  margin: 7px 0 12px;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+}
+
+.number-system-header > p {
+  max-width: 800px;
+  line-height: 1.65;
+  color: #64757d;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #00877f;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.stage-progress {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 34px;
+}
+
+.stage-progress button {
+  min-height: 64px;
+  padding: 10px;
+  border: 1px solid #d3dedf;
+  border-radius: 10px;
+  background: #fffefa;
+  color: #64757d;
+  cursor: pointer;
+}
+
+.stage-progress button span {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.72rem;
+}
+
+.stage-progress button.active {
+  border-color: #00877f;
+  background: #e7f4f1;
+  color: #102a36;
+  box-shadow: inset 0 -4px #00877f;
+}
+
+.lesson-stage {
+  display: grid;
+  gap: 28px;
+}
+
+.concept-heading {
+  max-width: 900px;
+}
+
+.concept-heading h3 {
+  margin: 7px 0 12px;
+  font-size: clamp(1.7rem, 3vw, 2.5rem);
+}
+
+.concept-heading p {
+  line-height: 1.65;
+  color: #64757d;
+}
+
+.math-statement {
+  margin: 16px 0;
+  padding: 18px 22px;
+  border-left: 5px solid #00877f;
+  border-radius: 8px;
+  background: #eef7f5;
+  font-family: Georgia, serif;
+  font-size: clamp(1.15rem, 2vw, 1.6rem);
+}
+
+.number-line-wrapper {
+  position: relative;
+  height: 145px;
+  margin: 35px 32px 15px;
+}
+
+.number-line {
+  position: absolute;
+  top: 58px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #6d7d83;
+}
+
+.number-line::before,
+.number-line::after {
+  content: "";
+  position: absolute;
+  top: -7px;
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+
+.number-line::before {
+  left: -2px;
+  border-right: 12px solid #6d7d83;
+}
+
+.number-line::after {
+  right: -2px;
+  border-left: 12px solid #6d7d83;
+}
+
+.number-line.continuous {
+  height: 8px;
+  background: #00877f;
+  box-shadow: 0 0 18px rgba(0, 135, 127, 0.35);
+}
+
+.tick {
+  position: absolute;
+  top: 50px;
+  transform: translateX(-50%);
+}
+
+.tick-mark {
+  display: block;
+  width: 2px;
+  height: 19px;
+  background: #839296;
+}
+
+.tick-label {
+  display: block;
+  margin-top: 8px;
+  color: #64757d;
+  font-size: 0.8rem;
+}
+
+.number-point {
+  position: absolute;
+  top: 47px;
+  transform: translateX(-50%);
+  z-index: 5;
+}
+
+.point-dot {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid white;
+  border-radius: 50%;
+  background: #123f4c;
+  box-shadow: 0 0 0 2px #123f4c;
+}
+
+.point-label {
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  min-width: max-content;
+  transform: translateX(-50%);
+  font-weight: 700;
+}
+
+.number-point.result .point-dot {
+  background: #00877f;
+  box-shadow: 0 0 0 3px #75ddd4;
+}
+
+.number-point.missing .point-dot {
+  background: #fffefa;
+  box-shadow: 0 0 0 3px #c58a32;
+}
+
+.number-point.irrational .point-dot {
+  background: #c58a32;
+  box-shadow: 0 0 0 2px #c58a32;
+}
+
+.interaction-card,
+.teaching-box,
+.approximation-panel,
+.completeness-card,
+.complete-line-message {
+  padding: 24px;
+  border: 1px solid #d3dedf;
+  border-radius: 14px;
+  background: #fffefa;
+}
+
+.control-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.control-grid label {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+}
+
+.control-grid input[type="range"] {
+  width: 100%;
+  accent-color: #00877f;
+}
+
+.operation-display {
+  margin-top: 24px;
+  padding: 22px;
+  border-radius: 10px;
+  background: #f2f6f5;
+  text-align: center;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+}
+
+.success-message {
+  margin-top: 16px;
+  padding: 13px 16px;
+  border-left: 4px solid #397a63;
+  background: #eef7f1;
+  color: #285b48;
+  font-weight: 700;
+}
+
+.warning-message {
+  margin-top: 16px;
+  padding: 13px 16px;
+  border-left: 4px solid #c58a32;
+  background: #fff7e9;
+}
+
+.equivalent-operation {
+  margin-top: 18px;
+  color: #64757d;
+  line-height: 1.55;
+}
+
+.teaching-box {
+  border-left: 5px solid #00877f;
+}
+
+.teaching-box strong {
+  font-size: 1.12rem;
+}
+
+.teaching-box p {
+  color: #64757d;
+  line-height: 1.6;
+}
+
+.transition-question {
+  padding: 26px;
+  border-radius: 14px;
+  background: #123f4c;
+  color: white;
+}
+
+.transition-question h4 {
+  margin: 0 0 10px;
+  font-size: 1.35rem;
+}
+
+.transition-question p {
+  line-height: 1.6;
+}
+
+.transition-question button {
+  margin-top: 12px;
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #75ddd4;
+  color: #102a36;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.fraction-controls {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.fraction-controls > div {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+}
+
+.fraction-controls label {
+  display: grid;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.fraction-controls input {
+  width: 72px;
+  padding: 9px;
+  border: 1px solid #b4c3c2;
+  border-radius: 7px;
+  font: inherit;
+}
+
+.operation-symbol {
+  padding-bottom: 8px;
+  font-size: 1.6rem;
+}
+
+.fraction {
+  display: inline-grid;
+  grid-template-rows: auto auto;
+  vertical-align: middle;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.fraction span:first-child {
+  padding: 0 4px 3px;
+  border-bottom: 1.5px solid currentColor;
+}
+
+.fraction span:last-child {
+  padding-top: 3px;
+}
+
+.fraction-equation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.approximation-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 13px;
+  margin: 20px 0;
+  font-family: Georgia, serif;
+  font-size: 1.25rem;
+}
+
+.approximation-row span {
+  padding: 8px 11px;
+  border-radius: 7px;
+  background: #f2f6f5;
+}
+
+.approximation-row strong {
+  padding: 8px 12px;
+  border: 2px solid #c58a32;
+  border-radius: 7px;
+}
+
+.irrational-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.irrational-card-grid article {
+  padding: 18px;
+  border: 1px solid #d3dedf;
+  border-radius: 10px;
+  background: white;
+}
+
+.irrational-card-grid strong {
+  display: block;
+  margin-bottom: 8px;
+  font-family: Georgia, serif;
+  font-size: 1.5rem;
+}
+
+.irrational-card-grid span {
+  color: #64757d;
+}
+
+.complete-line-message {
+  text-align: center;
+}
+
+.complete-line-message strong {
+  font-size: 1.35rem;
+}
+
+.complete-line-message p {
+  color: #64757d;
+}
+
+.completeness-card {
+  border-top: 5px solid #00877f;
+}
+
+.completeness-card h4 {
+  margin: 8px 0 10px;
+  font-size: 1.6rem;
+}
+
+.completeness-card > p:not(.eyebrow) {
+  color: #64757d;
+  line-height: 1.65;
+}
+
+.structure-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.structure-grid article {
+  padding: 24px;
+  border: 1px solid #d3dedf;
+  border-radius: 12px;
+  background: #fffefa;
+}
+
+.structure-grid article > span {
+  color: #00877f;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.structure-grid h4 {
+  margin: 7px 0 9px;
+  font-size: 1.35rem;
+}
+
+.structure-grid p {
+  color: #64757d;
+  line-height: 1.55;
+}
+
+.final-statement {
+  padding: 34px;
+  border-radius: 16px;
+  background: #123f4c;
+  color: white;
+  text-align: center;
+}
+
+.final-statement > span {
+  color: #75ddd4;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.final-statement h3 {
+  margin: 10px 0;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+.containment-chain {
+  padding: 22px;
+  text-align: center;
+  font-family: Georgia, serif;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+}
+
+.animation-navigation {
+  margin-top: 35px;
+  padding-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #d3dedf;
+}
+
+.animation-navigation button {
+  padding: 11px 17px;
+  border: 1px solid #00877f;
+  border-radius: 8px;
+  background: #00877f;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.animation-navigation button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.animation-navigation span {
+  color: #64757d;
+  font-weight: 700;
+}
+
+@media (max-width: 850px) {
+  .stage-progress {
+    grid-template-columns: 1fr;
+  }
+
+  .control-grid,
+  .structure-grid,
+  .irrational-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fraction-controls {
+    align-items: center;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
+  .number-system-demo {
+    padding: 18px;
+  }
+
+  .number-line-wrapper {
+    margin-left: 18px;
+    margin-right: 18px;
+  }
+
+  .animation-navigation {
+    gap: 12px;
+  }
+
+  .animation-navigation span {
+    font-size: 0.8rem;
+  }
+}

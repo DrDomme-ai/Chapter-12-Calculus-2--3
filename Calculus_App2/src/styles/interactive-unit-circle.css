@@ -1,0 +1,488 @@
+.interactive-unit-circle {
+  min-width: 0;
+  padding: clamp(20px, 3vw, 34px);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: 0 16px 42px rgba(16, 42, 54, 0.08);
+  color: var(--text-primary);
+}
+
+.interactive-unit-circle *,
+.interactive-unit-circle *::before,
+.interactive-unit-circle *::after {
+  box-sizing: border-box;
+}
+
+.interactive-unit-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 22px;
+}
+
+.interactive-unit-heading h3 {
+  margin: 7px 0 8px;
+  color: var(--primary);
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  line-height: 1.12;
+}
+
+.interactive-unit-heading p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.unit-circle-equation {
+  padding: 14px 18px;
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, var(--border));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent-light) 12%, var(--surface));
+  color: var(--primary);
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.unit-circle-toolbar {
+  margin-top: 22px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.unit-circle-toolbar > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.unit-circle-toolbar button,
+.unit-special-buttons button {
+  min-height: 44px;
+  padding: 9px 13px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--primary);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.unit-circle-toolbar button:hover,
+.unit-special-buttons button:hover {
+  border-color: var(--accent);
+}
+
+.unit-circle-toolbar button.active,
+.unit-special-buttons button.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: white;
+}
+
+.unit-circle-toolbar button:focus-visible,
+.unit-special-buttons button:focus-visible,
+.interactive-unit-svg:focus-visible,
+.unit-circle-controls input:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-light) 68%, white);
+  outline-offset: 2px;
+}
+
+.unit-circle-toolbar .practice-button.active {
+  border-color: var(--warning);
+  background: var(--warning);
+}
+
+.unit-practice-message {
+  margin-top: 13px;
+  padding: 12px 15px;
+  border-left: 4px solid var(--warning);
+  border-radius: 0 10px 10px 0;
+  background: color-mix(in srgb, var(--warning) 9%, var(--surface));
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.unit-circle-workspace {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: minmax(360px, 1.25fr) minmax(280px, 0.75fr);
+  gap: 20px;
+}
+
+.unit-circle-stage,
+.unit-circle-controls {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--background) 70%, var(--surface));
+}
+
+.unit-circle-stage {
+  padding: clamp(8px, 2vw, 18px);
+}
+
+.interactive-unit-svg {
+  display: block;
+  width: min(100%, 600px);
+  height: auto;
+  margin: 0 auto;
+  border-radius: 12px;
+  touch-action: none;
+  cursor: crosshair;
+  user-select: none;
+}
+
+.interactive-unit-ring {
+  fill: rgba(255, 255, 255, 0.78);
+  stroke: var(--primary);
+  stroke-width: 2.5;
+}
+
+.interactive-unit-axis {
+  stroke: var(--text-secondary);
+  stroke-width: 1.4;
+  opacity: 0.68;
+}
+
+.interactive-unit-svg text {
+  fill: var(--text-secondary);
+  font-family: inherit;
+  pointer-events: none;
+}
+
+.interactive-unit-svg .unit-axis-name {
+  fill: var(--primary);
+  font-size: 18px;
+  font-weight: 850;
+}
+
+.unit-special-label {
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.unit-radius-line {
+  stroke: var(--primary);
+  stroke-width: 3;
+}
+
+.unit-cosine-guide {
+  stroke: var(--accent);
+  stroke-width: 3.5;
+  stroke-dasharray: 7 5;
+}
+
+.unit-sine-guide {
+  stroke: var(--warning);
+  stroke-width: 3.5;
+  stroke-dasharray: 3 5;
+}
+
+.unit-guide-label rect {
+  fill: rgba(255, 254, 250, 0.92);
+  stroke-width: 1;
+}
+
+.unit-guide-label text {
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.unit-guide-label-cosine rect {
+  stroke: var(--accent);
+}
+
+.unit-guide-label-cosine text {
+  fill: color-mix(in srgb, var(--accent) 76%, var(--primary));
+}
+
+.unit-guide-label-sine rect {
+  stroke: var(--warning);
+}
+
+.unit-guide-label-sine text {
+  fill: color-mix(in srgb, var(--warning) 78%, var(--primary));
+}
+
+.unit-point-handle {
+  fill: var(--accent);
+  stroke: white;
+  stroke-width: 4;
+}
+
+.unit-point-label {
+  fill: var(--primary) !important;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.unit-circle-origin {
+  fill: var(--primary);
+}
+
+.unit-circle-stage > p {
+  margin: 7px auto 0;
+  max-width: 590px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.unit-circle-controls {
+  padding: clamp(17px, 2.5vw, 25px);
+  align-self: start;
+}
+
+.unit-circle-controls > label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  font-weight: 750;
+}
+
+.unit-circle-controls > label strong {
+  color: var(--primary);
+}
+
+.unit-circle-controls > input {
+  width: 100%;
+  margin: 11px 0 20px;
+  accent-color: var(--accent);
+}
+
+.unit-special-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.unit-special-buttons button {
+  min-width: 0;
+  min-height: 51px;
+  padding: 6px 4px;
+  display: grid;
+  place-items: center;
+  gap: 1px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.unit-special-buttons small {
+  color: var(--text-secondary);
+  font-size: 0.62rem;
+}
+
+.unit-special-buttons button.active small {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.unit-circle-readouts {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: minmax(150px, 0.72fr) minmax(260px, 1.55fr) minmax(150px, 0.73fr);
+  gap: 10px;
+}
+
+.unit-circle-readouts > div {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  display: grid;
+  gap: 7px;
+}
+
+.unit-circle-readouts > div > span,
+.unit-circle-readouts > p {
+  color: var(--text-secondary);
+}
+
+.unit-circle-readouts > div > span {
+  font-size: 0.69rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.unit-circle-readouts strong {
+  min-width: 0;
+  color: var(--primary);
+  font-size: clamp(1.05rem, 2vw, 1.32rem);
+  overflow-x: auto;
+}
+
+.unit-circle-readouts small {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.unit-circle-readouts.is-hidden {
+  display: block;
+  padding: 18px;
+  border: 1px dashed var(--warning);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--warning) 7%, var(--surface));
+  text-align: center;
+}
+
+.unit-circle-readouts.is-hidden p {
+  margin: 0;
+}
+
+.unit-sign-panel {
+  margin-top: 12px;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--accent-light) 8%, var(--surface));
+  display: grid;
+  grid-template-columns: minmax(145px, 0.6fr) minmax(280px, 1.4fr);
+  align-items: center;
+  gap: 18px;
+}
+
+.unit-sign-panel h4 {
+  margin: 6px 0 0;
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+.unit-sign-panel dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.unit-sign-panel dl > div {
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+}
+
+.unit-sign-panel dt {
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.unit-sign-panel dd {
+  margin: 4px 0 0;
+  color: var(--primary);
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.unit-circle-identity {
+  margin-top: 14px;
+  padding: 18px 20px;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 12px 12px 0;
+  background: color-mix(in srgb, var(--accent-light) 11%, var(--surface));
+  text-align: center;
+}
+
+.unit-circle-identity .math-display {
+  margin: 9px 0;
+}
+
+.unit-circle-identity p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 930px) {
+  .interactive-unit-heading,
+  .unit-circle-workspace,
+  .unit-sign-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .unit-circle-equation {
+    justify-self: stretch;
+    text-align: center;
+  }
+
+  .unit-circle-readouts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .unit-circle-readouts .unit-point-readout {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .interactive-unit-circle {
+    padding: 15px;
+    border-radius: 15px;
+  }
+
+  .unit-circle-toolbar,
+  .unit-circle-toolbar > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .unit-circle-toolbar button {
+    min-width: 0;
+    padding-inline: 7px;
+  }
+
+  .unit-circle-stage {
+    padding: 2px;
+  }
+
+  .unit-special-label {
+    font-size: 18px;
+    font-weight: 850;
+  }
+
+  .unit-guide-label {
+    display: none;
+  }
+
+  .unit-special-buttons {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .unit-circle-readouts,
+  .unit-sign-panel dl {
+    grid-template-columns: 1fr;
+  }
+
+  .unit-circle-readouts .unit-point-readout {
+    grid-column: auto;
+  }
+
+  .unit-circle-readouts strong {
+    font-size: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interactive-unit-circle *,
+  .interactive-unit-circle *::before,
+  .interactive-unit-circle *::after {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}

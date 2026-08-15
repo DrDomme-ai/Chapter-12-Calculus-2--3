@@ -1,0 +1,250 @@
+:where(
+  .trig-lesson-section-heading,
+  .trig-lesson-card,
+  .trig-lesson-example,
+  .trig-lesson-challenge,
+  .trig-lesson-mistake,
+  .trig-lesson-concept-check,
+  .trig-lesson-mastery
+) {
+  --trig-block-canvas: var(--background, #f7f5ef);
+  --trig-block-surface: var(--surface, #fffefa);
+  --trig-block-ink: var(--text-primary, #102a36);
+  --trig-block-primary: var(--primary, #123f4c);
+  --trig-block-accent: var(--accent, #00877f);
+  --trig-block-accent-light: var(--accent-light, #75ddd4);
+  --trig-block-border: var(--border, #d3dedf);
+  --trig-block-muted: var(--text-secondary, #64757d);
+  --trig-block-success: var(--success, #397a63);
+  --trig-block-warning: var(--warning, #c58a32);
+  color: var(--trig-block-ink);
+}
+
+.trig-lesson-label {
+  margin: 0;
+  color: var(--trig-block-accent);
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.trig-lesson-section-heading {
+  max-width: 920px;
+  margin-bottom: 38px;
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 20px;
+}
+
+.trig-lesson-section-number {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--trig-block-accent);
+  border-radius: 50%;
+  color: var(--trig-block-accent);
+  font-size: .78rem;
+  font-weight: 900;
+}
+
+.trig-lesson-section-heading h2 {
+  margin: 8px 0 12px;
+  font-size: clamp(2.5rem, 6vw, 4.6rem);
+  line-height: .98;
+  letter-spacing: -.055em;
+}
+
+.trig-lesson-section-heading > div > :last-child { margin-bottom: 0; }
+.trig-lesson-introduction,
+.trig-lesson-section-heading > div > p:not(.trig-lesson-label) {
+  max-width: 800px;
+  color: var(--trig-block-muted);
+  font-size: 1.07rem;
+  line-height: 1.72;
+}
+
+.trig-lesson-opening-question {
+  color: var(--trig-block-primary) !important;
+  font: 600 italic clamp(1.15rem, 2.5vw, 1.45rem)/1.5 Georgia, serif;
+}
+
+.trig-lesson-card,
+.trig-lesson-example,
+.trig-lesson-challenge,
+.trig-lesson-mistake,
+.trig-lesson-concept-check,
+.trig-lesson-mastery {
+  min-width: 0;
+  margin-top: 20px;
+  padding: clamp(24px, 4vw, 38px);
+  border: 1px solid var(--trig-block-border);
+  border-radius: 18px;
+  background: var(--trig-block-surface);
+  box-shadow: 0 14px 38px rgba(16, 42, 54, .055);
+}
+
+.trig-lesson-card h3,
+.trig-lesson-example h3,
+.trig-lesson-challenge h3,
+.trig-lesson-mistake h3,
+.trig-lesson-concept-check h3,
+.trig-lesson-mastery h3 {
+  margin: 8px 0 10px;
+  color: var(--trig-block-ink);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  letter-spacing: -.025em;
+}
+
+.trig-lesson-card-copy,
+.trig-lesson-card > p:not(.trig-lesson-label),
+.trig-lesson-example header > p:not(.trig-lesson-label),
+.trig-lesson-challenge header > p:not(.trig-lesson-label),
+.trig-lesson-concept-check > p:not(.trig-lesson-label),
+.trig-lesson-mastery > header p {
+  color: var(--trig-block-muted);
+  line-height: 1.68;
+}
+
+.trig-lesson-definition-card { border-top: 4px solid var(--trig-block-accent); }
+.trig-lesson-formula-card { background: #edf6f3; }
+.trig-lesson-formula-card .math-display,
+.trig-lesson-definition-card .math-display { margin: 18px 0; }
+
+.trig-lesson-actions {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.trig-lesson-primary-action,
+.trig-lesson-secondary-action,
+.trig-lesson-quiet-action {
+  min-height: 42px;
+  padding: 10px 15px;
+  border-radius: 9px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.trig-lesson-primary-action {
+  border: 1px solid var(--trig-block-accent);
+  background: var(--trig-block-accent);
+  color: white;
+}
+
+.trig-lesson-secondary-action {
+  border: 1px solid var(--trig-block-border);
+  background: white;
+  color: var(--trig-block-primary);
+}
+
+.trig-lesson-quiet-action {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--trig-block-muted);
+}
+
+.trig-lesson-primary-action:disabled,
+.trig-lesson-secondary-action:disabled,
+.trig-lesson-quiet-action:disabled { opacity: .5; cursor: not-allowed; }
+.trig-lesson-secondary-action:hover:not(:disabled),
+.trig-lesson-quiet-action:hover:not(:disabled) { background: #edf6f3; }
+
+.trig-lesson-example { border-top: 4px solid var(--trig-block-primary); }
+.trig-lesson-example-steps { margin: 24px 0 0; padding: 0; display: grid; gap: 10px; list-style: none; }
+.trig-lesson-example-steps li { padding: 16px; display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 13px; border-radius: 12px; background: #f6f8f6; }
+.trig-lesson-example-steps li > span { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: var(--trig-block-primary); color: white; font-size: .78rem; font-weight: 900; }
+.trig-lesson-example-steps strong { color: var(--trig-block-primary); }
+.trig-lesson-example-steps p { margin: 6px 0; color: var(--trig-block-muted); line-height: 1.6; }
+.trig-lesson-example-steps .math-display { margin: 10px 0 0; text-align: left; }
+.trig-lesson-example-conclusion { margin-top: 15px; padding: 18px; border-left: 5px solid var(--trig-block-success); border-radius: 10px; background: #e8f3ed; }
+.trig-lesson-example-conclusion p { color: var(--trig-block-muted); }
+.trig-lesson-example-conclusion .math-display { margin-bottom: 0; text-align: left; }
+
+.trig-lesson-challenge { border-top: 4px solid var(--trig-block-accent); }
+.trig-lesson-answer-fields { margin-top: 23px; display: grid; gap: 14px; }
+.trig-lesson-answer-fields--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.trig-lesson-answer-fields--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.trig-lesson-answer-fields label { min-width: 0; display: grid; align-content: start; gap: 7px; color: var(--trig-block-primary); font-weight: 800; }
+.trig-lesson-answer-fields input { min-width: 0; width: 100%; padding: 12px; border: 1px solid var(--trig-block-border); border-radius: 9px; background: white; color: var(--trig-block-ink); font: inherit; box-sizing: border-box; }
+.trig-lesson-answer-fields input[aria-invalid='true'] { border-color: var(--trig-block-warning); }
+.trig-lesson-answer-fields small { color: var(--trig-block-muted); font-weight: 600; line-height: 1.4; }
+.trig-lesson-field-result.is-correct { color: var(--trig-block-success); }
+.trig-lesson-field-result.is-incorrect { color: #7b521b; }
+.trig-lesson-feedback { margin: 16px 0 0; padding: 13px 16px; border-radius: 9px; font-weight: 800; }
+.trig-lesson-feedback.is-correct { background: #e4f2eb; color: var(--trig-block-success); }
+.trig-lesson-feedback.is-incorrect { background: #fff1df; color: #7b521b; }
+.trig-lesson-hints { margin-top: 15px; display: grid; gap: 9px; }
+.trig-lesson-hints > div,
+.trig-lesson-solution { padding: 15px 18px; border-left: 4px solid var(--trig-block-warning); border-radius: 8px; background: #fff8e9; }
+.trig-lesson-hints p,
+.trig-lesson-solution p { margin-bottom: 0; color: var(--trig-block-muted); line-height: 1.6; }
+.trig-lesson-solution { margin-top: 15px; border-color: var(--trig-block-success); background: #e8f3ed; }
+.trig-lesson-solution .math-display { margin-bottom: 0; }
+
+.trig-lesson-mistake { border-color: #e8cfc7; background: #fff9f6; }
+.trig-lesson-mistake > header { display: flex; align-items: center; gap: 14px; }
+.trig-lesson-mistake > header > span { width: 42px; height: 42px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; background: #a54a40; color: white; font-size: 1.4rem; font-weight: 900; }
+.trig-lesson-mistake .trig-lesson-label { color: #8e4037; }
+.trig-lesson-mistake h3 { margin-bottom: 0; }
+.trig-lesson-mistake-claim { color: var(--trig-block-muted); line-height: 1.6; }
+.trig-lesson-mistake-question { color: var(--trig-block-primary); font-weight: 900; }
+.trig-lesson-mistake-explanation { margin-top: 17px; padding: 18px; border-radius: 11px; background: var(--trig-block-surface); }
+.trig-lesson-mistake-explanation p { color: var(--trig-block-muted); line-height: 1.62; }
+
+.trig-lesson-concept-check { background: #f5f8f6; }
+.trig-lesson-choice-grid { margin-top: 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.trig-lesson-choice-grid label { min-width: 0; padding: 13px 15px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--trig-block-border); border-radius: 10px; background: white; color: var(--trig-block-primary); cursor: pointer; }
+.trig-lesson-choice-grid label.is-selected { border-color: var(--trig-block-accent); background: #e5f3f0; }
+.trig-lesson-choice-grid input { flex: 0 0 auto; accent-color: var(--trig-block-accent); }
+.trig-lesson-choice-grid label > span { min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.trig-lesson-concept-explanation { margin-top: 17px; padding: 17px; border-left: 5px solid var(--trig-block-warning); border-radius: 9px; background: #fff1df; }
+.trig-lesson-concept-explanation.is-correct { border-color: var(--trig-block-success); background: #e4f2eb; }
+.trig-lesson-concept-explanation p { color: var(--trig-block-muted); line-height: 1.6; }
+.trig-lesson-concept-explanation .math-display { margin-bottom: 0; }
+
+.trig-lesson-mastery { box-shadow: 0 18px 50px rgba(16, 42, 54, .08); }
+.trig-lesson-mastery > header { display: flex; justify-content: space-between; align-items: flex-start; gap: 25px; }
+.trig-lesson-mastery > header > div { max-width: 740px; }
+.trig-lesson-mastery-status { flex: 0 0 auto; padding: 8px 11px; border-radius: 99px; background: #e9eeee; color: var(--trig-block-muted); font-size: .72rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.trig-lesson-mastery-status.status-mastered { background: #e4f2eb; color: var(--trig-block-success); }
+.trig-lesson-mastery-status.status-developing { background: #e5f3f0; color: var(--trig-block-accent); }
+.trig-lesson-mastery-status.status-needs-review { background: #fff1df; color: #7b521b; }
+.trig-lesson-mastery-items { margin-top: 25px; display: grid; gap: 14px; }
+.trig-lesson-mastery fieldset { min-width: 0; margin: 0; padding: 20px; border: 1px solid var(--trig-block-border); border-radius: 13px; }
+.trig-lesson-mastery fieldset.is-correct { border-color: var(--trig-block-success); }
+.trig-lesson-mastery fieldset.is-incorrect { border-color: var(--trig-block-warning); }
+.trig-lesson-mastery legend { padding: 0 8px; color: var(--trig-block-primary); font-weight: 900; }
+.trig-lesson-mastery legend > span { margin-right: 9px; color: var(--trig-block-accent); }
+.trig-lesson-mastery-explanation { margin-top: 14px; padding: 14px; border-radius: 9px; background: #f5f8f6; }
+.trig-lesson-mastery-explanation p { margin-bottom: 0; color: var(--trig-block-muted); line-height: 1.55; }
+.trig-lesson-mastery-result { margin-top: 20px; padding: 20px; display: grid; gap: 10px; border-radius: 13px; background: #edf6f3; }
+.trig-lesson-mastery-result > div { display: flex; justify-content: space-between; align-items: center; color: var(--trig-block-muted); font-weight: 800; }
+.trig-lesson-mastery-result strong { color: var(--trig-block-accent); font-size: 1.8rem; }
+.trig-lesson-mastery-result progress { width: 100%; height: 10px; accent-color: var(--trig-block-accent); }
+.trig-lesson-mastery-result p { margin: 0; color: var(--trig-block-primary); font-weight: 900; }
+
+@media (max-width: 720px) {
+  .trig-lesson-answer-fields--2,
+  .trig-lesson-answer-fields--3,
+  .trig-lesson-choice-grid { grid-template-columns: 1fr; }
+  .trig-lesson-mastery > header { flex-direction: column; }
+}
+
+@media (max-width: 520px) {
+  .trig-lesson-section-heading { grid-template-columns: 1fr; }
+  .trig-lesson-section-number { width: 44px; height: 44px; }
+  .trig-lesson-example-steps li { grid-template-columns: 30px minmax(0, 1fr); padding: 13px; }
+  .trig-lesson-example-steps li > span { width: 28px; height: 28px; }
+  .trig-lesson-actions > button { flex: 1 1 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trig-lesson-primary-action,
+  .trig-lesson-secondary-action,
+  .trig-lesson-quiet-action { scroll-behavior: auto; transition: none; }
+}
