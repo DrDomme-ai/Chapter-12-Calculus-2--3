@@ -26,6 +26,11 @@ const inverseSlides=[
   s('it-arcsin-derivative','Derivative of arcsine','derivation',[m('y=\arcsin x\Rightarrow\sin y=x'),m('\frac d{dx}\arcsin x=\frac1{\sqrt{1-x^2}}')],{revealSteps:['Differentiate implicitly','Solve for y′','Use cos²y=1−x²','Justify cos y≥0','State −1<x<1']}),
   s('it-slope','Arcsine slope near the endpoints','visualization',[m('\sqrt{1-x^2}\to0\quad\text{as }x\to\pm1')],{visualization:'inverseTrigExplorer',ask:'What happens to the tangent line near x=±1?',expected:'It becomes nearly vertical.'}),
   s('it-other-derivatives','Arccos and arctan derivatives','derivation',[m(String.raw`\frac{d}{dx}\arccos x=-\frac{1}{\sqrt{1-x^2}}`),m(String.raw`\frac{d}{dx}\arctan x=\frac{1}{1+x^2}`)],{revealSteps:['Derive arccos implicitly','Compare sign','Derive arctan','Use sec²y=1+tan²y']}),
+  s('it-inverse-trig-integrals','Integrals Involving Inverse Trigonometric Functions','formula',[
+    m(String.raw`\int \frac{1}{\sqrt{a^2-u^2}}\,du=\arcsin\left(\frac{u}{a}\right)+C`),
+    m(String.raw`\int \frac{1}{a^2+u^2}\,du=\frac{1}{a}\arctan\left(\frac{u}{a}\right)+C`),
+    m(String.raw`\int \frac{1}{\lvert u\rvert\sqrt{u^2-a^2}}\,du=\frac{1}{a}\operatorname{arcsec}\left(\frac{\lvert u\rvert}{a}\right)+C`),
+  ],{ask:'Which denominator pattern signals arcsine, arctangent, or arcsecant?',expected:'A square-root difference signals arcsine, a sum of squares signals arctangent, and an absolute value times a square-root difference signals arcsecant.'}),
   s('it-chain','Chain Rule application','worked-example',[m('y=\arcsin(2x)'),m('y\prime=\frac2{\sqrt{1-4x^2}}')],{ask:'What is the inner function and its derivative?',expected:'u=2x and u′=2.'}),
   s('it-reference','Inverse-trig derivative reference','formula',[list(['arcsin u: u′/√(1−u²)','arccos u: −u′/√(1−u²)','arctan u: u′/(1+u²)'])]),
   s('it-live','Inverse Trig Live Check','live-question',[t('Principal values · ranges · derivatives')],{question:{type:'multiple-choice',prompt:'What is the range of arcsin?',options:['[−1,1]','[−π/2,π/2]','[0,π]','All real numbers'],correctAnswer:1}}),
