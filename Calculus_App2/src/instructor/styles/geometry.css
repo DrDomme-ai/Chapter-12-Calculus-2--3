@@ -1,0 +1,224 @@
+.geometry-explorer {
+  --geometry-primary: var(--i-primary, #123f4c);
+  --geometry-secondary: #658a91;
+  --geometry-active: var(--i-warning, #c58a32);
+  --geometry-selected: var(--i-teal, #00877f);
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  color: var(--i-ink, #102a36);
+  container: geometry-stage / inline-size;
+  font-size: clamp(.7rem, 1.15vw, 1.05rem);
+}
+
+.geometry-explorer *,
+.geometry-explorer *::before,
+.geometry-explorer *::after { box-sizing: border-box; }
+
+.geometry-explorer__main {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(.45rem, 1.5cqw, 1rem);
+  display: grid;
+  grid-template-columns: minmax(12rem, .78fr) minmax(17rem, 1.22fr);
+  align-items: stretch;
+  gap: clamp(.65rem, 2cqw, 1.4rem);
+}
+
+.geometry-explorer__main--math { grid-template-columns: minmax(15rem, .92fr) minmax(17rem, 1.08fr); }
+
+.geometry-explorer__panel {
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(.55rem, 1.7cqw, 1.15rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(.28rem, .8cqw, .65rem);
+  border: 1px solid var(--i-line, #d3dedf);
+  border-left: 5px solid var(--geometry-selected);
+  border-radius: 14px;
+  background: #fffefaf2;
+  overflow: auto;
+}
+
+.geometry-explorer__panel h3 {
+  margin: 0;
+  color: var(--geometry-primary);
+  font-size: clamp(1rem, 2.25cqw, 1.65rem);
+  line-height: 1.08;
+}
+
+.geometry-explorer__panel p { margin: 0; color: var(--i-muted, #64757d); line-height: 1.4; }
+.geometry-explorer__panel > .math-display { margin: .1rem 0; font-size: clamp(.72rem, 1.55cqw, 1.12rem); }
+.geometry-kicker { color: var(--geometry-selected); font-size: .68em; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
+
+.geometry-explorer__canvas {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(.25rem, .8cqw, .65rem);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--i-line, #d3dedf);
+  border-radius: 16px;
+  background: radial-gradient(circle at 38% 30%, #fff 0 22%, transparent 54%), #f4f9f7;
+}
+
+.geometry-explorer__canvas svg,
+.geometry-joke svg {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: block;
+  overflow: visible;
+}
+
+.geometry-svg-math {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: var(--geometry-primary);
+  font-size: 16px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.geometry-svg-math .math-inline { padding: 1px 4px; border-radius: 5px; background: #fffefaeb; }
+
+.geometry-primary,
+.geometry-secondary,
+.geometry-active,
+.geometry-angle-arc,
+.geometry-right-marker,
+.geometry-parallel-mark,
+.geometry-faint-construction,
+.geometry-sphere-guide,
+.geometry-right-angles path {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.geometry-primary { stroke: var(--geometry-primary); stroke-width: 5; }
+.geometry-secondary { stroke: var(--geometry-secondary); stroke-width: 3; }
+.geometry-active { stroke: var(--geometry-active); stroke-width: 6; }
+.geometry-faint-construction { stroke: #b9c9ca; stroke-width: 2; stroke-dasharray: 7 7; }
+.geometry-dashed { stroke-dasharray: 9 7; }
+.geometry-point { fill: var(--geometry-selected); stroke: #fff; stroke-width: 4; vector-effect: non-scaling-stroke; }
+.geometry-midpoint { fill: var(--geometry-active); stroke: #fff; stroke-width: 4; vector-effect: non-scaling-stroke; }
+.geometry-draggable { cursor: grab; touch-action: none; }
+.geometry-draggable:focus { outline: none; stroke: var(--geometry-active); stroke-width: 7; }
+.geometry-triangle-shape { fill: #75ddd42e; }
+.geometry-circle { fill: #75ddd42b; stroke: var(--geometry-primary); stroke-width: 5; vector-effect: non-scaling-stroke; }
+.geometry-angle-arc { stroke: var(--geometry-selected); stroke-width: 5; }
+.geometry-right-marker,
+.geometry-right-angles path { stroke: var(--geometry-selected); stroke-width: 4; }
+.geometry-parallel-mark { stroke: var(--geometry-selected); stroke-width: 3; }
+
+.geometry-grid line { stroke: #cfdcdd; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.geometry-grid .geometry-axis { stroke: #738b91; stroke-width: 2.2; }
+
+.geometry-control { display: grid; gap: .2rem; color: var(--i-muted, #64757d); font-size: .78em; font-weight: 800; }
+.geometry-control > span { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.geometry-control b { color: var(--geometry-primary); }
+.geometry-control input { width: 100%; margin: 0; accent-color: var(--geometry-selected); cursor: pointer; }
+.geometry-control input:focus-visible { outline: 3px solid #00877f55; outline-offset: 3px; }
+.geometry-control-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .35rem .7rem; }
+
+.geometry-button-row,
+.geometry-button-grid { display: flex; flex-wrap: wrap; gap: .35rem; }
+.geometry-button-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.geometry-explorer button {
+  min-height: 2.25rem;
+  padding: .42rem .65rem;
+  border: 1px solid var(--geometry-selected);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--geometry-selected);
+  font: inherit;
+  font-size: .75em;
+  font-weight: 900;
+  cursor: pointer;
+}
+.geometry-explorer button:hover,
+.geometry-explorer button:focus-visible,
+.geometry-explorer button.active { background: var(--geometry-selected); color: #fff; }
+.geometry-explorer button:focus-visible { outline: 3px solid #75ddd488; outline-offset: 2px; }
+
+.geometry-conclusion {
+  padding: .4rem .55rem;
+  border-radius: 9px;
+  background: #e2f2ee;
+  color: var(--geometry-primary);
+  text-align: center;
+}
+.geometry-conclusion .math-display { margin: 0; }
+.geometry-conclusion strong { display: block; color: var(--geometry-selected); letter-spacing: .04em; text-transform: uppercase; }
+.geometry-calculus-bridge { padding: .45rem .6rem; border-left: 4px solid var(--geometry-active); background: #fff3df; color: #79511f !important; font-weight: 800; }
+
+.geometry-sphere { stroke: var(--geometry-primary); stroke-width: 3; vector-effect: non-scaling-stroke; }
+.geometry-sphere-guide { stroke: #68959a; stroke-width: 1.6; stroke-dasharray: 6 6; }
+.geometry-sphere-guide--back { opacity: .42; }
+.geometry-right-angles { animation: geometry-reveal .45s ease both; }
+
+.geometry-joke {
+  padding: clamp(.75rem, 2.5cqw, 1.8rem);
+  display: grid;
+  grid-template-columns: minmax(16rem, 1.05fr) minmax(15rem, .95fr);
+  align-items: center;
+  gap: clamp(.75rem, 3cqw, 2rem);
+  border-radius: 18px;
+  background: linear-gradient(130deg, var(--geometry-primary), #18585d);
+  color: #fff;
+}
+.geometry-joke__copy { display: grid; gap: .45rem; }
+.geometry-joke h3 { margin: 0; color: #fff; font-size: clamp(1.25rem, 3cqw, 2.35rem); line-height: 1.07; }
+.geometry-joke strong { color: var(--i-light, #75ddd4); font-size: clamp(.9rem, 1.8cqw, 1.35rem); }
+.geometry-joke p { margin: .6rem 0 0; color: #dceaea; }
+.geometry-joke svg { min-height: 11rem; border-radius: 14px; background: #fffefa; }
+.geometry-joke .geometry-infinite-line { marker-start: url(#parallel-arrow); marker-end: url(#parallel-arrow); }
+
+.geometry-rotating-ray { transform-origin: 150px 276px; transition: x2 .12s ease, y2 .12s ease; }
+.geometry-controls-compact { gap: .28rem; }
+.geometry-controls-compact .math-display { font-size: clamp(.62rem, 1.25cqw, .95rem); }
+.geometry-explorer--missing { display: grid; place-items: center; border: 2px dashed #b34b3f; color: #8c3e33; font-weight: 900; }
+
+@keyframes geometry-reveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@container geometry-stage (max-width: 650px) {
+  .geometry-explorer__main,
+  .geometry-explorer__main--math,
+  .geometry-joke { grid-template-columns: 1fr; }
+  .geometry-explorer__main { grid-template-rows: auto minmax(10rem, 1fr); }
+  .geometry-explorer__panel { max-height: 45%; padding: .55rem; }
+  .geometry-explorer__canvas { min-height: 10rem; }
+  .geometry-joke { grid-template-rows: auto 1fr; }
+  .geometry-joke svg { min-height: 8rem; }
+  .geometry-control-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+  .geometry-explorer__main,
+  .geometry-explorer__main--math,
+  .geometry-joke { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .geometry-explorer *,
+  .geometry-explorer *::before,
+  .geometry-explorer *::after { animation: none !important; transition: none !important; }
+}

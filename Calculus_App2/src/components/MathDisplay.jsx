@@ -31,7 +31,7 @@ export function MathDisplay({ children }) {
     <div className="math-display">
       {rendered.html
         ? <div dangerouslySetInnerHTML={{ __html: rendered.html }} />
-        : <code className="math-render-error">{rendered.formula}</code>}
+        : <span className="math-render-error" role="alert">Math needs correction</span>}
     </div>
   )
 }
@@ -41,5 +41,5 @@ export function MathInline({ children }) {
 
   return rendered.html
     ? <span className="math-inline" dangerouslySetInnerHTML={{ __html: rendered.html }} />
-    : <code className="math-render-error">{rendered.formula}</code>
+    : <span className="math-render-error" role="alert">Math needs correction</span>
 }

@@ -25,8 +25,8 @@ export const trigonometryReviewTopics = [
 export const trigonometryModules = [
   { number: '01', id: 'angles-radians', title: 'Angles and Radian Measure', description: 'Interpret an angle as rotation and connect radians to arc length.' },
   { number: '02', id: 'unit-circle', title: 'The Unit Circle', description: 'Read sine and cosine as the coordinates of a rotating point.' },
-  { number: '03', id: 'six-functions', title: 'The Six Trigonometric Functions', description: 'Build tangent, cotangent, secant, and cosecant from sine and cosine.' },
-  { number: '04', id: 'cofunctions', title: 'Cofunction Relationships', description: 'Use complementary angles to connect sine with cosine and tangent with cotangent.' },
+  { number: '03', id: 'six-functions', title: 'The Six Trigonometric Functions', description: 'Build tangent, cotangent, secant, and cosecant from sine and cosine.', status: 'Core Review · Interactive' },
+  { number: '04', id: 'cofunctions', title: 'Cofunction Relationships', description: 'Use complementary angles to connect sine with cosine and tangent with cotangent.', status: 'Core Review · Interactive' },
   { number: '05', id: 'pythagorean-identities', title: 'Pythagorean Identities', description: 'Let the circle equation generate the three central identities.' },
   { number: '06', id: 'symmetry', title: 'Symmetry', description: 'Recognize even and odd behavior geometrically and graphically.' },
   { number: '07', id: 'graphs', title: 'Trigonometric Graphs', description: 'Trace periodic graphs from motion around the unit circle.' },
@@ -42,4 +42,3 @@ export const trigonometryNextTopic = {
   previous: 'Algebra Review',
   next: 'Calculus I Review',
 }
-

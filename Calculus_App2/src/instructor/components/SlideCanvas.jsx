@@ -3,6 +3,9 @@ import NumberSystemStory from './NumberSystemStory'
 import FieldExplorer from './FieldExplorer'
 import VisualSlideCanvas from './VisualSlideCanvas'
 import LectureHooks from './LectureHooks'
+import LectureOpeningSlide from './LectureOpeningSlide'
+
+const CardValue=({value})=>typeof value==='string'&&(/\\[a-zA-Z]+|[_^]/.test(value))?<MathDisplay>{value}</MathDisplay>:value
 
 function NaturalAddition() {
   const values = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -26,13 +29,14 @@ function Content({ item }) {
   if (item.kind === 'list') return <ul>{item.value.map((entry) => <li key={entry}>{entry}</li>)}</ul>
   if (item.kind === 'callout') return <p className="slide-callout">{item.value}</p>
   if (item.kind === 'eyebrow') return <p className="slide-eyebrow">{item.value}</p>
-  if (item.kind === 'comparison') return <div className="field-comparison">{item.value.map((row) => <article key={row.label}><MathDisplay>{row.label}</MathDisplay><p>Field: {row.field}</p><p>Ordered: {row.ordered}</p><p>Complete: {row.complete}</p></article>)}</div>
+  if (item.kind === 'comparison') return <div className="field-comparison">{item.value.map((row) => <article key={row.label}><MathDisplay>{row.label}</MathDisplay><p><strong>{row.formula?'Formula:':'Field:'}</strong> {row.formula?<MathDisplay>{row.formula}</MathDisplay>:<CardValue value={row.field}/>}</p><p><strong>{row.characteristic?'Key Characteristic:':'Ordered:'}</strong> {row.characteristic||row.ordered}</p><p><strong>{row.behavior?'Behavior:':'Complete:'}</strong> {row.behavior||row.complete}</p></article>)}</div>
   if (item.value != null && typeof item.value === 'object') { console.error('Unsupported projected slide content', item); return null }
   return <p>{item.value}</p>
 }
 
-export default function SlideCanvas({ slide, revealCount = 0, audience = false }) {
-  if (slide.elements) return <VisualSlideCanvas slide={slide} revealCount={revealCount} />
+export default function SlideCanvas({ slide, revealCount = 0, audience = false, openingContext, inlineEditing=false, onInlineChange, selected=[], onSelect, onChange }) {
+  if(slide.visualization==='lecture-opening')return <article className={`lecture-slide slide-type-welcome${audience?' is-audience':''}`}><LectureOpeningSlide settings={slide.visualizationSettings} {...openingContext}/></article>
+  if (slide.elements) return <VisualSlideCanvas key={slide.id} slide={slide} revealCount={revealCount} inlineEditing={inlineEditing} onInlineChange={onInlineChange} selected={selected} onSelect={onSelect} onChange={onChange}/>
   const reveals = slide.revealSteps?.slice(0, revealCount) || []
   return <article className={`lecture-slide slide-type-${slide.type}${audience ? ' is-audience' : ''}`}>
     <header><span>{slide.type.replace('-', ' ')}</span><h2>{slide.title}</h2></header>

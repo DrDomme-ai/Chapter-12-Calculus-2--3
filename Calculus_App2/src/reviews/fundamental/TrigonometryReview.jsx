@@ -24,13 +24,16 @@ function getProgressStatus(completed, total) {
 
 export default function TrigonometryReview({
   completed = {},
-  totalActivities = 23,
+  totalActivities = 25,
   onReviewHome,
   onHome,
   onPrevious,
   onNext,
   onOpenAngles,
   onOpenUnitCircle,
+  onOpenSixFunctions,
+  onOpenCofunctions,
+  onOpenModule,
   onOpenPractice,
 }) {
   const completeCount = Object.values(completed).filter(Boolean).length
@@ -118,10 +121,14 @@ export default function TrigonometryReview({
                 ? onOpenAngles
                 : module.id === 'unit-circle'
                   ? onOpenUnitCircle
-                  : null
+                  : module.id === 'six-functions'
+                    ? onOpenSixFunctions
+                  : module.id === 'cofunctions'
+                      ? onOpenCofunctions
+                      : () => onOpenModule?.(module.id)
               return (
               <article key={module.id} className={openLesson ? 'is-available' : ''}>
-                <div><span>{module.number}</span>{module.advanced && <small>Advanced review</small>}</div>
+                <div><span>{module.number}</span>{module.status && <small>{module.status}</small>}{module.advanced && <small>Advanced review</small>}</div>
                 <h3>{module.title}</h3>
                 <p>{module.description}</p>
                 {openLesson ? (

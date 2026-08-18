@@ -1,184 +1,616 @@
-// Simple in-memory mock live session service for local UI prototyping.
-// Not persistent and only intended for local testing of instructor/student flows.
+// Local live-class service used by the instructor and student prototypes.
+//
+// State is kept in localStorage and announced through BroadcastChannel so
+// instructor, projector, and student views opened in separate same-origin
+// tabs/windows stay in sync. It deliberately makes no network requests.
+
+const STORAGE_KEY = 'interactive-calculus:mock-live:v2'
+const CHANNEL_NAME = 'interactive-calculus:mock-live:v2'
+const STORAGE_VERSION = 2
 
 let sessionCounter = 1
+let currentRevision = ''
 const sessions = new Map()
 const sessionSubscribers = new Map()
 const questionSubscribers = new Map()
 const responseSubscribers = new Map()
 
+const browserAvailable = typeof window !== 'undefined'
+const transportOrigin = makeToken('tab')
+
+function makeToken(prefix) {
+  const randomPart = globalThis.crypto?.randomUUID?.() || Math.random().toString(36).slice(2)
+  return `${prefix}-${Date.now()}-${randomPart}`
+}
+
+function makeEntityId() {
+  // A safe numeric id preserves the existing API while avoiding collisions
+  // when several student tabs submit at nearly the same time.
+  return Date.now() * 1000 + Math.floor(Math.random() * 1000)
+}
+
 function makeJoinCode() {
-  return Math.floor(100000 + Math.random() * 900000).toString()
+  let code
+  do {
+    code = Math.floor(100000 + Math.random() * 900000).toString()
+  } while ([...sessions.values()].some((session) => session.status === 'live' && session.join_code === code))
+  return code
+}
+
+const blockedAliasPattern=/\b(admin|instructor|professor|teacher|fuck|shit|bitch)\b/i
+const clean=(value,max=60)=>String(value||'').trim().replace(/\s+/g,' ').slice(0,max)
+
+function publicName(profile, fallbackNumber) {
+  const mode=['firstName','alias','anonymous'].includes(profile.display_mode)?profile.display_mode:'anonymous'
+  if(mode==='anonymous')return 'Anonymous'
+  if(mode==='firstName')return clean(profile.true_student_name).split(' ')[0]||`Student ${fallbackNumber}`
+  const alias=clean(profile.display_name,24)
+  return alias&&!blockedAliasPattern.test(alias)?alias:`Student ${fallbackNumber}`
+}
+
+function normalizeParticipant(participant,index=0){
+  const trueName=clean(participant.true_student_name||participant.name||'Student')
+  const displayMode=['firstName','alias','anonymous'].includes(participant.display_mode)?participant.display_mode:'anonymous'
+  const displayName=publicName({...participant,true_student_name:trueName,display_mode:displayMode},index+1)
+  return {...participant,true_student_id:participant.true_student_id||participant.external_id||String(participant.id),true_student_name:trueName,display_mode:displayMode,display_name:displayName,name:displayName}
+}
+
+function ensureSubscriberBuckets(id) {
+  if (!sessionSubscribers.has(id)) sessionSubscribers.set(id, new Set())
+  if (!questionSubscribers.has(id)) questionSubscribers.set(id, new Set())
+  if (!responseSubscribers.has(id)) responseSubscribers.set(id, new Set())
+}
+
+function normalizeSession(rawSession) {
+  if (!rawSession || rawSession.id == null) return null
+
+  const normalized = {
+    ...rawSession,
+    participants: Array.isArray(rawSession.participants) ? rawSession.participants.map(normalizeParticipant) : [],
+    questions: Array.isArray(rawSession.questions) ? rawSession.questions : [],
+    responses: Array.isArray(rawSession.responses) ? rawSession.responses : [],
+    comprehensions: Array.isArray(rawSession.comprehensions) ? rawSession.comprehensions : [],
+  }
+
+  if (rawSession.active_question?.id != null) {
+    normalized.active_question = normalized.questions.find(
+      (question) => question.id === rawSession.active_question.id,
+    ) || rawSession.active_question
+  }
+
+  return normalized
+}
+
+function mergeUnique(existing = [], incoming = [], keyForItem) {
+  const merged = new Map()
+  existing.forEach((item) => merged.set(keyForItem(item), item))
+  incoming.forEach((item) => {
+    const key = keyForItem(item)
+    merged.set(key, { ...(merged.get(key) || {}), ...item })
+  })
+  return [...merged.values()]
+}
+
+function mergeSession(existing, incoming) {
+  if (!existing) return normalizeSession(incoming)
+  const merged = normalizeSession({
+    ...existing,
+    ...incoming,
+    participants: mergeUnique(
+      existing.participants,
+      incoming.participants,
+      (participant) => participant.external_id || participant.id,
+    ),
+    questions: mergeUnique(existing.questions, incoming.questions, (question) => question.id),
+    responses: mergeUnique(existing.responses, incoming.responses, (response) => response.id),
+    comprehensions: mergeUnique(
+      existing.comprehensions,
+      incoming.comprehensions,
+      (entry) => entry.id,
+    ),
+  })
+
+  if (merged.active_question?.id != null) {
+    merged.active_question = merged.questions.find(
+      (question) => question.id === merged.active_question.id,
+    ) || merged.active_question
+  }
+  return merged
+}
+
+function questionSignature(question) {
+  if (!question) return ''
+  return JSON.stringify({
+    id: question.id,
+    status: question.status,
+    opened_at: question.opened_at,
+    prompt: question.prompt || question.text,
+  })
+}
+
+function readStoredPayload() {
+  if (!browserAvailable) return null
+  try {
+    const value = window.localStorage.getItem(STORAGE_KEY)
+    if (!value) return null
+    const payload = JSON.parse(value)
+    return payload?.version === STORAGE_VERSION && Array.isArray(payload.sessions) ? payload : null
+  } catch {
+    // Storage can be disabled by browser privacy settings. The in-memory and
+    // BroadcastChannel paths remain usable in that case.
+    return null
+  }
+}
+
+function applyPayload(payload, { notify = true } = {}) {
+  if (!payload || payload.version !== STORAGE_VERSION || !Array.isArray(payload.sessions)) return
+  if (payload.revision && payload.revision === currentRevision) return
+
+  const previousSessions = new Map(sessions)
+  payload.sessions.forEach((rawSession) => {
+    const incoming = normalizeSession(rawSession)
+    if (!incoming) return
+    sessions.set(incoming.id, mergeSession(sessions.get(incoming.id), incoming))
+    ensureSubscriberBuckets(incoming.id)
+  })
+
+  sessionCounter = Math.max(sessionCounter, Number(payload.sessionCounter) || 1)
+  currentRevision = payload.revision || currentRevision
+
+  if (!notify) return
+
+  sessions.forEach((session, id) => {
+    const previous = previousSessions.get(id)
+    const previousResponseIds = new Set((previous?.responses || []).map((response) => response.id))
+    session.responses
+      .filter((response) => !previousResponseIds.has(response.id))
+      .forEach((response) => notifyResponses(id, response))
+
+    if (questionSignature(previous?.active_question) !== questionSignature(session.active_question)) {
+      if (session.active_question) notifyQuestion(id, { ...session.active_question })
+    }
+    notifySession(id)
+  })
+}
+
+function refreshFromStorage() {
+  const payload = readStoredPayload()
+  if (payload?.revision !== currentRevision) applyPayload(payload)
+}
+
+let liveChannel = null
+if (browserAvailable) {
+  applyPayload(readStoredPayload(), { notify: false })
+
+  if (typeof window.BroadcastChannel === 'function') {
+    liveChannel = new window.BroadcastChannel(CHANNEL_NAME)
+    liveChannel.addEventListener('message', (event) => {
+      if (event.data?.origin === transportOrigin) return
+      applyPayload(event.data)
+    })
+  }
+
+  window.addEventListener('storage', (event) => {
+    if (event.key !== STORAGE_KEY || !event.newValue) return
+    try {
+      applyPayload(JSON.parse(event.newValue))
+    } catch {
+      // Ignore malformed storage written by an unrelated script or old build.
+    }
+  })
+}
+
+function persistState() {
+  currentRevision = makeToken('revision')
+  const payload = {
+    version: STORAGE_VERSION,
+    origin: transportOrigin,
+    revision: currentRevision,
+    sessionCounter,
+    sessions: [...sessions.values()],
+  }
+
+  if (browserAvailable) {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
+    } catch {
+      // Keep the current tab functional if localStorage is unavailable/full.
+    }
+  }
+  liveChannel?.postMessage(payload)
+}
+
+function touchSession(session) {
+  session.updated_at = new Date().toISOString()
+}
+
+function studentSessionView(session,participantId){
+  if(!session)return null
+  const participant=session.participants.find(item=>item.id===participantId||item.external_id===participantId)
+  return {
+    id:session.id,lecture_id:session.lecture_id,join_code:session.join_code,status:session.status,
+    current_slide_index:session.current_slide_index,question_status:session.question_status,
+    active_question:session.active_question?{...session.active_question,eligible_participant_ids:undefined}:null,
+    comprehension_open:Boolean(session.comprehension_open),shared_response:session.shared_response||null,
+    participants:participant?[{...participant}]:[],responses:[],questions:[],
+  }
+}
+
+export function getProjectorSession(sessionOrId){
+  refreshFromStorage()
+  const session=typeof sessionOrId==='object'?sessionOrId:sessions.get(sessionOrId)
+  if(!session)return null
+  return {
+    id:session.id,status:session.status,question_status:session.question_status,
+    participant_count:session.participants.length,shared_response:session.shared_response||null,
+    active_question:session.active_question?{...session.active_question,eligible_participant_ids:undefined,eligible_participant_count:session.active_question.eligible_participant_ids?.length||session.participants.length}:null,
+    responses:(session.responses||[]).map(({question_id,answer,correct})=>({question_id,answer,correct})),
+  }
 }
 
 export function createSession({ lectureId = 'real-numbers', createdBy = 'instructor' } = {}) {
-  const id = sessionCounter++
-  const join_code = makeJoinCode()
+  refreshFromStorage()
+  const id = makeEntityId()
+  sessionCounter += 1
   const session = {
     id,
     lecture_id: lectureId,
     created_by: createdBy,
-    join_code,
+    join_code: makeJoinCode(),
     status: 'live',
     current_slide_index: 0,
     question_status: null,
     participants: [],
     questions: [],
     responses: [],
+    comprehensions: [],
+    created_at: new Date().toISOString(),
   }
+  touchSession(session)
   sessions.set(id, session)
-  sessionSubscribers.set(id, new Set())
-  questionSubscribers.set(id, new Set())
+  ensureSubscriberBuckets(id)
+  persistState()
   notifySession(id)
   return session
 }
 
 export function endSession(id) {
+  refreshFromStorage()
   const session = sessions.get(id)
   if (!session) return
   session.status = 'ended'
+  touchSession(session)
+  persistState()
   notifySession(id)
 }
 
 export function changeSlide(id, nextIndex) {
+  refreshFromStorage()
   const session = sessions.get(id)
   if (!session) return
   session.current_slide_index = nextIndex
+  touchSession(session)
+  persistState()
   notifySession(id)
 }
 
 export function openQuestion(id, question) {
+  refreshFromStorage()
   const session = sessions.get(id)
-  if (!session) return
-  const q = { attempts:1,timer:null,immediateFeedback:false,topic:'General',difficulty:'medium',id: session.questions.length + 1, ...question, status:'open',opened_at:new Date().toISOString(),eligible_participant_ids:session.participants.map((p)=>p.id) }
+  if (!session) return null
+  const q = {
+    attempts: 1,
+    timer: null,
+    immediateFeedback: false,
+    topic: 'General',
+    difficulty: 'medium',
+    id: makeEntityId(),
+    ...question,
+    status: 'open',
+    opened_at: new Date().toISOString(),
+    eligible_participant_ids: session.participants.map((participant) => participant.id),
+  }
   session.questions.push(q)
   session.active_question = q
+  session.shared_response = null
   session.question_status = 'open'
-  notifyQuestion(id, q)
+  touchSession(session)
+  persistState()
+  notifyQuestion(id, { ...q })
   notifySession(id)
   return q
 }
 
-function setQuestionStatus(id,status){
-  const session=sessions.get(id);if(!session?.active_question)return null
-  session.active_question.status=status;session.question_status=status
-  notifyQuestion(id,{...session.active_question});notifySession(id);return session.active_question
+function setQuestionStatus(id, status) {
+  refreshFromStorage()
+  const session = sessions.get(id)
+  if (!session?.active_question) return null
+  session.active_question.status = status
+  session.question_status = status
+  touchSession(session)
+  persistState()
+  notifyQuestion(id, { ...session.active_question })
+  notifySession(id)
+  return session.active_question
 }
-export const closeQuestion=(id)=>setQuestionStatus(id,'closed')
-export const showQuestionResults=(id)=>setQuestionStatus(id,'results')
-export const revealQuestionAnswer=(id)=>setQuestionStatus(id,'answer-revealed')
-export const reopenQuestion=(id)=>setQuestionStatus(id,'open')
+
+export const closeQuestion = (id) => setQuestionStatus(id, 'closed')
+export const showQuestionResults = (id) => setQuestionStatus(id, 'results')
+export const revealQuestionAnswer = (id) => setQuestionStatus(id, 'answer-revealed')
+export const reopenQuestion = (id) => setQuestionStatus(id, 'open')
 
 export function submitResponse(sessionId, response) {
+  refreshFromStorage()
   const session = sessions.get(sessionId)
   if (!session) return null
-  const question=session.questions.find((q)=>q.id===response.question_id)
-  if(!question||question.status!=='open')return null
-  const participantId=response.participant_id||response.participant?.id
-  const attempts=session.responses.filter((item)=>item.question_id===response.question_id&&item.participant_id===participantId).length
-  if(question.attempts!=='unlimited'&&attempts>=Number(question.attempts||1))return null
-  const answer=response.answer, correct=Array.isArray(question.correctAnswer)?question.correctAnswer.every((v)=>answer?.includes(v))&&answer.length===question.correctAnswer.length:String(answer)===String(question.correctAnswer??question.correct_option_index)
-  const r = { id: session.responses.length + 1, submitted_at: new Date().toISOString(),response_time_ms:Date.now()-new Date(question.opened_at).getTime(),correct, ...response,participant_id:participantId }
-  session.responses.push(r)
-  notifyResponses(sessionId, r)
+  const question = session.questions.find((item) => item.id === response.question_id)
+  if (!question || question.status !== 'open') return null
+  const participantId = response.participant_id || response.participant?.id
+  const attempts = session.responses.filter(
+    (item) => item.question_id === response.question_id && item.participant_id === participantId,
+  ).length
+  if (question.attempts !== 'unlimited' && attempts >= Number(question.attempts || 1)) return null
+
+  const answer = response.answer
+  const correct = question.graded===false?null:Array.isArray(question.correctAnswer)
+    ? question.correctAnswer.every((value) => answer?.includes(value))
+      && answer.length === question.correctAnswer.length
+    : String(answer) === String(question.correctAnswer ?? question.correct_option_index)
+  const result = {
+    id: makeEntityId(),
+    submitted_at: new Date().toISOString(),
+    response_time_ms: Date.now() - new Date(question.opened_at).getTime(),
+    correct,
+    ...response,
+    participant_id: participantId,
+  }
+  session.responses.push(result)
+  touchSession(session)
+  persistState()
+  notifyResponses(sessionId, result)
   notifySession(sessionId)
-  return r
+  return result
 }
 
-export function subscribeResponses(id, cb) {
-  let subs = responseSubscribers.get(id)
-  if (!subs) {
-    subs = new Set()
-    responseSubscribers.set(id, subs)
-  }
-  subs.add(cb)
-  // send existing responses
-  const session = sessions.get(id)
-  if (session && session.responses) session.responses.forEach((r) => cb(r))
-  return () => subs.delete(cb)
+export function subscribeResponses(id, callback) {
+  refreshFromStorage()
+  ensureSubscriberBuckets(id)
+  const subscribers = responseSubscribers.get(id)
+  subscribers.add(callback)
+  sessions.get(id)?.responses?.forEach((response) => callback(response))
+  return () => subscribers.delete(callback)
 }
 
 function notifyResponses(id, response) {
-  const subs = responseSubscribers.get(id)
-  if (!subs) return
-  subs.forEach((cb) => cb(response))
+  responseSubscribers.get(id)?.forEach((callback) => callback(response))
 }
 
 export function openComprehension(sessionId) {
+  refreshFromStorage()
   const session = sessions.get(sessionId)
   if (!session) return
   session.comprehension_open = true
   session.comprehensions = session.comprehensions || []
+  touchSession(session)
+  persistState()
   notifySession(sessionId)
 }
 
 export function submitComprehension(sessionId, participant, data) {
+  refreshFromStorage()
   const session = sessions.get(sessionId)
   if (!session) return null
   session.comprehensions = session.comprehensions || []
-  const entry = { id: session.comprehensions.length + 1, participant, data, submitted_at: new Date().toISOString() }
+  const entry = {
+    id: makeEntityId(),
+    participant_id:participant.id,
+    data,
+    submitted_at: new Date().toISOString(),
+  }
   session.comprehensions.push(entry)
+  touchSession(session)
+  persistState()
   notifySession(sessionId)
   return entry
 }
 
 export function joinByCode(joinCode, participant = {}) {
+  refreshFromStorage()
+  const normalizedCode = String(joinCode || '').trim()
   for (const session of sessions.values()) {
-    if (session.join_code === joinCode) {
-      // If the session has ended, return it without adding a participant
-      if (session.status === 'ended') return session
-      const existing=session.participants.find((item)=>participant.id&&item.external_id===participant.id)
-      if(existing){existing.connected=true;existing.last_active_at=new Date().toISOString();notifySession(session.id);return session}
-      const p = { id: session.participants.length + 1,external_id:participant.id, ...participant, connected:true,joined_at_question:session.questions.length+1,joined_at: new Date().toISOString(),last_active_at:new Date().toISOString() }
-      session.participants.push(p)
+    if (session.join_code !== normalizedCode) continue
+    if (session.status === 'ended') return session
+
+    const { id: externalId, ...participantProfile } = participant
+    const existing = externalId
+      ? session.participants.find((item) => item.external_id === externalId)
+      : null
+    if (existing) {
+      existing.true_student_id=participantProfile.true_student_id||existing.true_student_id||externalId
+      existing.true_student_name=clean(participantProfile.true_student_name||participantProfile.name||existing.true_student_name)
+      existing.display_mode=participantProfile.display_mode||existing.display_mode||'anonymous'
+      existing.display_name=publicName({...existing,...participantProfile},session.participants.indexOf(existing)+1)
+      existing.name=existing.display_name
+      existing.connected = true
+      existing.last_active_at = new Date().toISOString()
+      touchSession(session)
+      persistState()
       notifySession(session.id)
       return session
     }
+
+    const now = new Date().toISOString()
+    const joinedParticipant = {
+      ...participantProfile,
+      id: makeEntityId(),
+      external_id: externalId || null,
+      true_student_id:participantProfile.true_student_id||externalId||null,
+      true_student_name:clean(participantProfile.true_student_name||participantProfile.name||'Student'),
+      display_mode:participantProfile.display_mode||'anonymous',
+      display_name:publicName(participantProfile,session.participants.length+1),
+      connected: true,
+      joined_at_question: session.questions.length + 1,
+      joined_at: now,
+      last_active_at: now,
+    }
+    joinedParticipant.name=joinedParticipant.display_name
+    session.participants.push(joinedParticipant)
+    touchSession(session)
+    persistState()
+    notifySession(session.id)
+    return session
   }
   return null
 }
 
+export function joinStudentByCode(joinCode,participant={}){
+  const session=joinByCode(joinCode,participant)
+  if(!session)return null
+  const own=session.participants.find(item=>item.external_id===participant.id)
+  return studentSessionView(session,own?.id)
+}
+
+export function updateParticipantDisplay(sessionId,participantId,{display_mode,display_name}={}){
+  refreshFromStorage()
+  const session=sessions.get(sessionId),participant=session?.participants.find(item=>item.id===participantId)
+  if(!participant)return {ok:false,error:'Participant not found.'}
+  const mode=['firstName','alias','anonymous'].includes(display_mode)?display_mode:participant.display_mode
+  const requested=clean(display_name,24)
+  if(mode==='alias'){
+    if(requested.length<2)return {ok:false,error:'Choose a display name with at least 2 characters.'}
+    if(blockedAliasPattern.test(requested))return {ok:false,error:'That display name is not available. Choose another.'}
+    if(session.participants.some(item=>item.id!==participant.id&&item.display_name.toLowerCase()===requested.toLowerCase()))return {ok:false,error:'That display name is already in use.'}
+  }
+  participant.display_mode=mode
+  participant.display_name=publicName({...participant,display_mode:mode,display_name:requested},session.participants.indexOf(participant)+1)
+  participant.name=participant.display_name
+  participant.last_active_at=new Date().toISOString()
+  touchSession(session);persistState();notifySession(sessionId)
+  return {ok:true,participant:{...participant}}
+}
+
+export function shareResponseAnonymously(sessionId,responseId){
+  refreshFromStorage()
+  const session=sessions.get(sessionId),response=session?.responses.find(item=>item.id===responseId)
+  const question=session?.questions.find(item=>item.id===response?.question_id)
+  if(!session||!response||!question?.shareableAnonymously)return false
+  session.shared_response={text:String(response.answer),shared_at:new Date().toISOString()}
+  touchSession(session);persistState();notifySession(sessionId)
+  return true
+}
+
 export function regenerateJoinCode(sessionId) {
+  refreshFromStorage()
   const session = sessions.get(sessionId)
   if (!session) return null
   session.join_code = makeJoinCode()
+  touchSession(session)
+  persistState()
   notifySession(sessionId)
   return session.join_code
 }
 
-export function subscribeSession(id, cb) {
-  const subs = sessionSubscribers.get(id)
-  if (!subs) return () => {}
-  subs.add(cb)
-  // send initial state
-  cb(sessions.get(id))
-  return () => subs.delete(cb)
+export function subscribeSession(id, callback) {
+  refreshFromStorage()
+  ensureSubscriberBuckets(id)
+  const subscribers = sessionSubscribers.get(id)
+  subscribers.add(callback)
+  callback(sessions.get(id))
+  return () => subscribers.delete(callback)
 }
 
-export function subscribeQuestions(id, cb) {
-  const subs = questionSubscribers.get(id)
-  if (!subs) return () => {}
-  subs.add(cb)
-  const active=sessions.get(id)?.active_question
-  if(active)cb({...active})
-  return () => subs.delete(cb)
+export function subscribeStudentSession(id,participantId,callback){
+  return subscribeSession(id,session=>callback(studentSessionView(session,participantId)))
 }
 
-export function getNonResponders(id,questionId){const s=sessions.get(id);if(!s)return[];const q=s.questions.find((item)=>item.id===questionId)||s.active_question;if(!q)return[];const answered=new Set(s.responses.filter((r)=>r.question_id===q.id).map((r)=>r.participant_id));return s.participants.filter((p)=>q.eligible_participant_ids.includes(p.id)&&!answered.has(p.id))}
-export function getParticipationStats(id){const s=sessions.get(id);if(!s)return[];return s.participants.map((p)=>{const available=s.questions.filter((q)=>q.eligible_participant_ids.includes(p.id)).length;const responses=s.responses.filter((r)=>r.participant_id===p.id);const answered=new Set(responses.map((r)=>r.question_id)).size,correct=responses.filter((r)=>r.correct).length;return{participant:p,available,answered,skipped:Math.max(0,available-answered),participation:available?Math.round(answered/available*100):0,correct,incorrect:responses.length-correct,accuracy:responses.length?Math.round(correct/responses.length*100):0}})}
-export function getTopicAccuracy(id){const s=sessions.get(id);if(!s)return[];const topics={};s.questions.forEach((q)=>{const rs=s.responses.filter((r)=>r.question_id===q.id);const key=q.topic||'General';topics[key]??={topic:key,correct:0,total:0};topics[key].correct+=rs.filter((r)=>r.correct).length;topics[key].total+=rs.length});return Object.values(topics).map((x)=>({...x,accuracy:x.total?Math.round(x.correct/x.total*100):0}))}
+export function getSessionReport(id,{audience='instructor'}={}){
+  refreshFromStorage()
+  const session=sessions.get(id)
+  if(!session)return null
+  if(audience==='class'){
+    return {lectureId:session.lecture_id,status:session.status,connected:session.participants.length,questions:session.questions.map(question=>({prompt:question.prompt||question.text,category:question.category,responded:new Set(session.responses.filter(response=>response.question_id===question.id).map(response=>response.participant_id)).size,distribution:(question.options||[]).map((option,index)=>({option,count:session.responses.filter(response=>response.question_id===question.id&&Number(response.answer)===index).length}))}))}
+  }
+  return {lectureId:session.lecture_id,status:session.status,createdAt:session.created_at,updatedAt:session.updated_at,participants:session.participants.map(participant=>{const responses=session.responses.filter(response=>response.participant_id===participant.id),comprehension=session.comprehensions.find(entry=>entry.participant_id===participant.id);return{trueStudentId:participant.true_student_id,trueStudentName:participant.true_student_name,displayMode:participant.display_mode,displayName:participant.display_name,connected:participant.connected,joinedAt:participant.joined_at,responses:responses.map(response=>{const question=session.questions.find(item=>item.id===response.question_id);return{question:question?.prompt||question?.text,category:question?.category,answer:response.answer,correct:response.correct,responseTimeMs:response.response_time_ms,submittedAt:response.submitted_at}}),comprehension:comprehension?.data||null}})}
+}
+
+export function subscribeQuestions(id, callback) {
+  refreshFromStorage()
+  ensureSubscriberBuckets(id)
+  const subscribers = questionSubscribers.get(id)
+  subscribers.add(callback)
+  const activeQuestion = sessions.get(id)?.active_question
+  if (activeQuestion) callback({ ...activeQuestion })
+  return () => subscribers.delete(callback)
+}
+
+export function getNonResponders(id, questionId) {
+  refreshFromStorage()
+  const session = sessions.get(id)
+  if (!session) return []
+  const question = session.questions.find((item) => item.id === questionId) || session.active_question
+  if (!question) return []
+  const answered = new Set(
+    session.responses
+      .filter((response) => response.question_id === question.id)
+      .map((response) => response.participant_id),
+  )
+  return session.participants.filter(
+    (participant) => question.eligible_participant_ids.includes(participant.id)
+      && !answered.has(participant.id),
+  )
+}
+
+export function getParticipationStats(id) {
+  refreshFromStorage()
+  const session = sessions.get(id)
+  if (!session) return []
+  return session.participants.map((participant) => {
+    const available = session.questions.filter(
+      (question) => question.eligible_participant_ids.includes(participant.id),
+    ).length
+    const responses = session.responses.filter((response) => response.participant_id === participant.id)
+    const answered = new Set(responses.map((response) => response.question_id)).size
+    const gradedResponses=responses.filter((response)=>response.correct!=null)
+    const correct = gradedResponses.filter((response) => response.correct).length
+    return {
+      participant,
+      available,
+      answered,
+      skipped: Math.max(0, available - answered),
+      participation: available ? Math.round((answered / available) * 100) : 0,
+      correct,
+      incorrect: gradedResponses.length - correct,
+      accuracy: gradedResponses.length ? Math.round((correct / gradedResponses.length) * 100) : 0,
+    }
+  })
+}
+
+export function getTopicAccuracy(id) {
+  refreshFromStorage()
+  const session = sessions.get(id)
+  if (!session) return []
+  const topics = {}
+  session.questions.forEach((question) => {
+    const responses = session.responses.filter((response) => response.question_id === question.id)
+    const key = question.topic || 'General'
+    topics[key] ??= { topic: key, correct: 0, total: 0 }
+    const graded=responses.filter((response)=>response.correct!=null)
+    topics[key].correct += graded.filter((response) => response.correct).length
+    topics[key].total += graded.length
+  })
+  return Object.values(topics).map((topic) => ({
+    ...topic,
+    accuracy: topic.total ? Math.round((topic.correct / topic.total) * 100) : 0,
+  }))
+}
 
 function notifySession(id) {
-  const subs = sessionSubscribers.get(id)
-  if (!subs) return
   const session = sessions.get(id)
-  subs.forEach((cb) => cb(session))
+  sessionSubscribers.get(id)?.forEach((callback) => callback(session))
 }
 
 function notifyQuestion(id, question) {
-  const subs = questionSubscribers.get(id)
-  if (!subs) return
-  subs.forEach((cb) => cb(question))
+  questionSubscribers.get(id)?.forEach((callback) => callback(question))
 }
 
 export default {
@@ -186,9 +618,21 @@ export default {
   endSession,
   changeSlide,
   openQuestion,
-  closeQuestion,showQuestionResults,revealQuestionAnswer,reopenQuestion,getNonResponders,getParticipationStats,getTopicAccuracy,
+  closeQuestion,
+  showQuestionResults,
+  revealQuestionAnswer,
+  reopenQuestion,
+  getNonResponders,
+  getParticipationStats,
+  getTopicAccuracy,
   joinByCode,
+  joinStudentByCode,
+  updateParticipantDisplay,
+  shareResponseAnonymously,
   subscribeSession,
+  subscribeStudentSession,
+  getProjectorSession,
+  getSessionReport,
   subscribeQuestions,
   submitResponse,
   subscribeResponses,

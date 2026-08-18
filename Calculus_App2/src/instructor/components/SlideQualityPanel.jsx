@@ -1,10 +1,8 @@
-import { useMemo, useState } from 'react'
-import { auditSlide, autoFitSlide } from '../services/slideQualityService'
+import { useMemo } from 'react'
+import { auditSlide } from '../services/slideQualityService'
 
-export default function SlideQualityPanel({ slide, onSelect, onApply }) {
-  const [proposal, setProposal] = useState(null)
+export default function SlideQualityPanel({ slide, onSelect }) {
   const audit = useMemo(() => auditSlide(slide), [slide])
-  const preview = proposal ? auditSlide(proposal) : null
   const checks = [
     ['inside', 'All content within safe area'],
     ['readable', 'Readable projector text'],
@@ -18,7 +16,6 @@ export default function SlideQualityPanel({ slide, onSelect, onApply }) {
     <div className="quality-checks">{checks.map(([key, label]) => <span className={audit.checks[key] ? 'pass' : 'warn'} key={key}>{audit.checks[key] ? 'Pass:' : 'Review:'} {label}</span>)}</div>
     {audit.issues.length > 0 && <details><summary>Identify affected objects</summary>{audit.issues.map((issue, index) => <button onClick={() => onSelect(issue.elementIds)} key={`${issue.type}-${index}`}>{issue.message}</button>)}</details>}
     {audit.suggestSplit && <p className="split-suggestion">Suggest Split: keep the main definition or visual together and move the example or question to a following slide.</p>}
-    <div className="quality-actions"><button onClick={() => setProposal(autoFitSlide(slide))}>Preview Auto Fit</button><button onClick={() => setProposal(autoFitSlide(slide, { tidy: true }))}>Preview Tidy Layout</button></div>
-    {proposal && <div className="fit-preview"><strong>Preview</strong><span>{audit.issues.length} issues to {preview.issues.length} issues</span><p>No changes have been applied.</p><button onClick={() => { onApply(proposal); setProposal(null) }}>Apply</button><button onClick={() => setProposal(null)}>Cancel</button></div>}
+    <p className="manual-layout-note">Manual layout mode: select an affected object, then drag or resize it inside the dotted safe area.</p>
   </section>
 }

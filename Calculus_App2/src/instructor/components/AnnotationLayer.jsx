@@ -5,6 +5,7 @@ const AnnotationLayer = forwardRef(function AnnotationLayer({ active = true, too
   const [history, setHistory] = useState(paths)
   const [redo, setRedo] = useState([])
   const drawing = useRef(null)
+  const historyRef = useRef(paths)
 
   const paint = () => {
     const canvas = canvasRef.current
@@ -30,23 +31,24 @@ const AnnotationLayer = forwardRef(function AnnotationLayer({ active = true, too
   }
 
   useEffect(paint, [history])
-  useEffect(() => { setHistory(paths || []); setRedo([]) }, [paths])
+  useEffect(() => { historyRef.current=paths||[];setHistory(paths || []); setRedo([]) }, [paths])
   useEffect(() => { const observer = new ResizeObserver(paint); if (canvasRef.current) observer.observe(canvasRef.current); return () => observer.disconnect() })
 
-  const point = (event) => { const rect = canvasRef.current.getBoundingClientRect(); return { x: (event.clientX - rect.left) / rect.width, y: (event.clientY - rect.top) / rect.height } }
+  const point = (event) => { const rect = canvasRef.current.getBoundingClientRect(); return { x: (event.clientX - rect.left) / rect.width, y: (event.clientY - rect.top) / rect.height, pressure:event.pressure||.5 } }
   const down = (event) => {
     if (!active || tool === 'pointer') return
     event.currentTarget.setPointerCapture(event.pointerId)
     drawing.current = { tool, color, width, points: [point(event)] }
-    setHistory((current) => [...current, drawing.current]); setRedo([])
+    setHistory((current) => {const next=[...current,drawing.current];historyRef.current=next;return next}); setRedo([])
   }
   const move = (event) => {
     if (!drawing.current) return
-    drawing.current = { ...drawing.current, points: [...drawing.current.points, point(event)] }
-    setHistory((current) => [...current.slice(0, -1), drawing.current])
+    const samples=event.getCoalescedEvents?.()||[event]
+    drawing.current = { ...drawing.current, points: [...drawing.current.points,...samples.map(point)] }
+    setHistory((current) => {const next=[...current.slice(0,-1),drawing.current];historyRef.current=next;return next})
   }
-  const up = () => { if (!drawing.current) return; drawing.current = null; onChange?.(history) }
-  const update = useCallback((nextHistory, nextRedo = redo) => { setHistory(nextHistory); setRedo(nextRedo); onChange?.(nextHistory) }, [onChange, redo])
+  const up = () => { if (!drawing.current) return; drawing.current = null; onChange?.(historyRef.current) }
+  const update = useCallback((nextHistory, nextRedo = redo) => { historyRef.current=nextHistory;setHistory(nextHistory); setRedo(nextRedo); onChange?.(nextHistory) }, [onChange, redo])
 
   useImperativeHandle(ref, () => ({
     undo: () => history.length && update(history.slice(0, -1), [history.at(-1), ...redo]),

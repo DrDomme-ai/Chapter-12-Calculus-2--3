@@ -5,6 +5,9 @@ import liveService from '../../lib/mockLive'
 export const createLectureSession = (lectureId) => liveService.createSession({ lectureId })
 export const endLectureSession = (sessionId) => liveService.endSession(sessionId)
 export const joinLectureSession = (code, participant) => liveService.joinByCode(code, participant)
+export const joinStudentLectureSession = (code, participant) => liveService.joinStudentByCode(code, participant)
+export const updateParticipantDisplay = (sessionId, participantId, display) => liveService.updateParticipantDisplay(sessionId, participantId, display)
+export const shareResponseAnonymously = (sessionId, responseId) => liveService.shareResponseAnonymously(sessionId, responseId)
 export const changeLectureSlide = (sessionId, index) => liveService.changeSlide(sessionId, index)
 export const openLectureQuestion = (sessionId, question) => liveService.openQuestion(sessionId, question)
 export const closeLectureQuestion = (sessionId) => liveService.closeQuestion(sessionId)
@@ -15,10 +18,13 @@ export const submitLectureResponse = (sessionId, response) => liveService.submit
 export const openLectureComprehension = (sessionId) => liveService.openComprehension(sessionId)
 export const submitComprehensionCheck = (sessionId, participant, data) => liveService.submitComprehension(sessionId, participant, data)
 export const subscribeToSession = (sessionId, callback) => liveService.subscribeSession(sessionId, callback)
+export const subscribeToStudentSession = (sessionId, participantId, callback) => liveService.subscribeStudentSession(sessionId, participantId, callback)
 export const subscribeToQuestions = (sessionId, callback) => liveService.subscribeQuestions(sessionId, callback)
 export const subscribeToResponses = (sessionId, callback) => liveService.subscribeResponses(sessionId, callback)
 
 export const getParticipants = (session) => session?.participants || []
+export const getProjectorSession = (session) => liveService.getProjectorSession(session)
+export const getSessionReport = (sessionId, options) => liveService.getSessionReport(sessionId, options)
 export const getResponses = (session) => session?.responses || []
 export const getComprehensionResults = (session) => session?.comprehensions || []
 export const getNonResponders = (session) => session ? liveService.getNonResponders(session.id,session.active_question?.id) : []

@@ -1,0 +1,638 @@
+.cofunction-triangle-explorer {
+  min-width: 0;
+  padding: clamp(20px, 3vw, 34px);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: 0 16px 42px rgba(16, 42, 54, 0.08);
+  color: var(--text-primary);
+}
+
+.cofunction-triangle-explorer *,
+.cofunction-triangle-explorer *::before,
+.cofunction-triangle-explorer *::after {
+  box-sizing: border-box;
+}
+
+.cofunction-explorer-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 22px;
+}
+
+.cofunction-explorer-heading h3 {
+  margin: 7px 0 8px;
+  color: var(--primary);
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  line-height: 1.12;
+}
+
+.cofunction-explorer-heading p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.cofunction-explorer-heading p strong {
+  color: var(--primary);
+}
+
+.cofunction-complement-badge {
+  padding: 14px 17px;
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, var(--border));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent-light) 12%, var(--surface));
+  color: var(--primary);
+  font-size: 1.08rem;
+  font-weight: 850;
+  text-align: center;
+}
+
+.cofunction-explorer-layout {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: minmax(390px, 1.15fr) minmax(290px, 0.85fr);
+  grid-template-areas:
+    'stage controls'
+    'relationships relationships';
+  align-items: start;
+  gap: 20px;
+}
+
+.cofunction-triangle-stage,
+.cofunction-controls {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--background) 70%, var(--surface));
+}
+
+.cofunction-triangle-stage {
+  grid-area: stage;
+  padding: clamp(10px, 2vw, 18px);
+}
+
+.cofunction-view-banner {
+  padding: 11px 14px;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  background: var(--surface);
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+}
+
+.cofunction-view-banner > span {
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cofunction-view-banner > strong {
+  color: var(--primary);
+  font-size: 1.05rem;
+}
+
+.cofunction-view-banner > small {
+  width: 100%;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+}
+
+.cofunction-triangle-scroll {
+  min-width: 0;
+}
+
+.cofunction-triangle-scroll:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-light) 68%, white);
+  outline-offset: 2px;
+}
+
+.cofunction-triangle-stage svg {
+  display: block;
+  width: min(100%, 630px);
+  height: auto;
+  margin: 4px auto 0;
+  overflow: visible;
+}
+
+.cofunction-triangle-area {
+  fill: color-mix(in srgb, var(--accent-light) 12%, white);
+}
+
+.cofunction-side {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.cofunction-side-a {
+  stroke: var(--warning);
+  stroke-width: 5;
+  stroke-dasharray: 4 5;
+}
+
+.cofunction-side-b {
+  stroke: var(--accent);
+  stroke-width: 5;
+}
+
+.cofunction-side-c {
+  stroke: var(--primary);
+  stroke-width: 5;
+  stroke-dasharray: 11 5;
+}
+
+.cofunction-right-angle {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 2;
+}
+
+.cofunction-triangle-stage svg text {
+  font-family: inherit;
+  pointer-events: none;
+}
+
+.cofunction-right-label {
+  fill: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.cofunction-angle-arc {
+  fill: none;
+  stroke: var(--text-secondary);
+  stroke-width: 2;
+  stroke-dasharray: 3 4;
+  opacity: 0.65;
+}
+
+.cofunction-angle-arc.is-active {
+  stroke: var(--accent);
+  stroke-width: 5;
+  stroke-dasharray: none;
+  opacity: 1;
+}
+
+.cofunction-angle-label {
+  fill: var(--text-secondary);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.cofunction-angle-label.is-active {
+  fill: var(--accent);
+  font-size: 21px;
+  font-weight: 950;
+}
+
+.cofunction-side-label rect {
+  fill: color-mix(in srgb, var(--surface) 94%, transparent);
+  stroke-width: 1.5;
+}
+
+.cofunction-label-a rect {
+  stroke: var(--warning);
+}
+
+.cofunction-label-b rect {
+  stroke: var(--accent);
+}
+
+.cofunction-label-c rect {
+  stroke: var(--primary);
+}
+
+.cofunction-side-label text:first-of-type {
+  fill: var(--primary);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.cofunction-side-label text:last-of-type {
+  fill: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.cofunction-role-summary {
+  margin: 2px 0 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.cofunction-role-summary > div {
+  min-width: 0;
+  padding: 10px 11px;
+  border: 1px solid var(--border);
+  border-top: 4px solid;
+  border-radius: 9px;
+  background: var(--surface);
+}
+
+.cofunction-role-summary .is-side-a {
+  border-top-color: var(--warning);
+}
+
+.cofunction-role-summary .is-side-b {
+  border-top-color: var(--accent);
+}
+
+.cofunction-role-summary .is-side-c {
+  border-top-color: var(--primary);
+}
+
+.cofunction-role-summary dt {
+  color: var(--text-secondary);
+  font-size: 0.66rem;
+  font-weight: 750;
+}
+
+.cofunction-role-summary dd {
+  margin: 4px 0 0;
+  color: var(--primary);
+  font-size: 0.73rem;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.cofunction-controls {
+  grid-area: controls;
+  padding: clamp(18px, 2.5vw, 26px);
+  display: grid;
+  gap: 19px;
+}
+
+.cofunction-view-controls,
+.cofunction-angle-control {
+  display: grid;
+  gap: 9px;
+}
+
+.cofunction-view-controls > span {
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cofunction-view-controls > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.cofunction-view-controls button,
+.cofunction-common-angles button,
+.cofunction-reset-button {
+  min-width: 0;
+  min-height: 44px;
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--primary);
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 820;
+  cursor: pointer;
+}
+
+.cofunction-view-controls button:hover,
+.cofunction-common-angles button:hover,
+.cofunction-reset-button:hover {
+  border-color: var(--accent);
+}
+
+.cofunction-view-controls button.active,
+.cofunction-common-angles button.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: white;
+}
+
+.cofunction-view-controls button:focus-visible,
+.cofunction-common-angles button:focus-visible,
+.cofunction-reset-button:focus-visible,
+.cofunction-angle-control input:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-light) 68%, white);
+  outline-offset: 2px;
+}
+
+.cofunction-view-controls > small,
+.cofunction-angle-control > small {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.cofunction-angle-control label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  font-weight: 750;
+}
+
+.cofunction-angle-control output {
+  color: var(--primary);
+  font-weight: 900;
+}
+
+.cofunction-angle-control input {
+  width: 100%;
+  min-height: 28px;
+  accent-color: var(--accent);
+}
+
+.cofunction-common-angles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.cofunction-live-complement {
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.cofunction-live-complement > div {
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+}
+
+.cofunction-live-complement > div > span {
+  color: var(--text-secondary);
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cofunction-live-complement strong {
+  color: var(--primary);
+  font-size: 1.15rem;
+}
+
+.cofunction-plus {
+  color: var(--accent);
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.cofunction-total {
+  grid-column: 1 / -1;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  color: var(--primary);
+  font-size: 0.74rem;
+  font-weight: 850;
+  text-align: center;
+}
+
+.cofunction-reset-button {
+  justify-self: start;
+  border-color: color-mix(in srgb, var(--warning) 45%, var(--border));
+}
+
+.cofunction-relationships {
+  grid-area: relationships;
+  min-width: 0;
+}
+
+.cofunction-relationships > header {
+  margin-bottom: 12px;
+}
+
+.cofunction-relationships h4 {
+  margin: 5px 0 0;
+  color: var(--primary);
+  font-size: clamp(1.2rem, 2.5vw, 1.55rem);
+}
+
+.cofunction-relationship-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cofunction-relationship-card {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--primary);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.cofunction-relationship-card.is-side-a {
+  border-top-color: var(--warning);
+}
+
+.cofunction-relationship-card.is-side-b {
+  border-top-color: var(--accent);
+}
+
+.cofunction-relationship-card.is-side-ratio {
+  border-top-style: double;
+  border-top-width: 5px;
+}
+
+.cofunction-relationship-card > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cofunction-relationship-card > header > span {
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.cofunction-relationship-card > header > strong {
+  color: var(--text-secondary);
+  font-size: 0.67rem;
+  text-transform: uppercase;
+}
+
+.cofunction-equality {
+  margin-top: 15px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+}
+
+.cofunction-equality > div {
+  min-width: 0;
+  padding: 10px 5px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--background) 72%, var(--surface));
+  color: var(--primary);
+  text-align: center;
+  overflow-x: auto;
+}
+
+.cofunction-equality > span {
+  color: var(--accent);
+  font-size: 1.45rem;
+  font-weight: 900;
+}
+
+.cofunction-shared-value {
+  margin-top: 9px;
+  padding: 8px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  text-align: center;
+}
+
+.cofunction-relationship-card > p {
+  margin: 10px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.cofunction-key-result {
+  margin-top: 12px;
+  padding: 16px;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 11px 11px 0;
+  background: color-mix(in srgb, var(--accent-light) 10%, var(--surface));
+  text-align: center;
+}
+
+.cofunction-key-result .math-display {
+  margin: 0;
+  color: var(--primary);
+  overflow-x: auto;
+}
+
+.cofunction-key-result p {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+  font-weight: 750;
+}
+
+.cofunction-reciprocal-followup {
+  margin-top: 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent-light) 7%, var(--surface));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+}
+
+.cofunction-reciprocal-followup p {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+}
+
+.cofunction-reciprocal-followup > div:last-child {
+  display: grid;
+  gap: 7px;
+  color: var(--primary);
+  font-weight: 800;
+}
+
+@media (max-width: 940px) {
+  .cofunction-explorer-heading {
+    grid-template-columns: 1fr;
+  }
+
+  .cofunction-complement-badge {
+    justify-self: stretch;
+  }
+
+  .cofunction-explorer-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'stage'
+      'relationships'
+      'controls';
+  }
+
+  .cofunction-relationship-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .cofunction-triangle-explorer {
+    padding: 15px;
+    border-radius: 15px;
+  }
+
+  .cofunction-triangle-stage {
+    padding: 5px;
+  }
+
+  .cofunction-triangle-scroll {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+
+  .cofunction-triangle-stage svg {
+    width: 480px;
+    min-width: 480px;
+  }
+
+  .cofunction-side-label text:first-of-type {
+    font-size: 15px;
+  }
+
+  .cofunction-side-label text:last-of-type {
+    font-size: 13px;
+  }
+
+  .cofunction-role-summary,
+  .cofunction-reciprocal-followup {
+    grid-template-columns: 1fr;
+  }
+
+  .cofunction-view-controls > div {
+    grid-template-columns: 1fr;
+  }
+
+  .cofunction-equality {
+    grid-template-columns: 1fr;
+  }
+
+  .cofunction-equality > span {
+    line-height: 0.7;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cofunction-triangle-explorer *,
+  .cofunction-triangle-explorer *::before,
+  .cofunction-triangle-explorer *::after {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}

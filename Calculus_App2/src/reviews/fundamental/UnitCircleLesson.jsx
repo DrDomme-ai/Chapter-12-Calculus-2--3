@@ -60,6 +60,7 @@ export default function UnitCircleLesson({
   onReviewHome,
   onHome,
   onPrevious,
+  onNext,
   onPractice,
 }) {
   const lesson = unitCircleLesson
@@ -317,6 +318,7 @@ export default function UnitCircleLesson({
             <button type="button" onClick={onPrevious}>← Previous: Angles and Radians</button>
             <button type="button" onClick={onOverview}>Trigonometry Overview</button>
             <button type="button" onClick={onPractice}>Guided practice →</button>
+            <button type="button" onClick={onNext}>Next: Six Trig Functions →</button>
           </nav>
         </section>
       </div>
