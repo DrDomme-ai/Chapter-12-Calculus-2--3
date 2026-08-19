@@ -98,7 +98,7 @@ function angleFromPointer(event, svg, previousAngle) {
   return Math.min(359, rounded)
 }
 
-export function AngleRadiansExplorer() {
+export function AngleRadiansExplorer({ presentationLayout = 'full' }) {
   const [angle, setAngle] = useState(INITIAL_ANGLE)
   const [radius, setRadius] = useState(INITIAL_RADIUS)
   const [displayMode, setDisplayMode] = useState('both')
@@ -111,6 +111,7 @@ export function AngleRadiansExplorer() {
   const headingId = useId()
   const descriptionId = useId()
   const readoutId = useId()
+  const isSlideSplit = presentationLayout === 'slide-split'
 
   const updateAngle = (nextAngle) => {
     const clamped = Math.max(0, Math.min(360, Math.round(nextAngle)))
@@ -215,7 +216,7 @@ export function AngleRadiansExplorer() {
   }
 
   return (
-    <section className="angle-radians-explorer" aria-labelledby={headingId}>
+    <section className={`angle-radians-explorer${isSlideSplit ? ' is-slide-split' : ''}`} aria-labelledby={headingId}>
       <header className="angle-radians-heading">
         <div>
           <span className="card-label">Visualize it</span>
@@ -316,7 +317,7 @@ export function AngleRadiansExplorer() {
           <div className="angle-special-angles" role="group" aria-label="Choose a special angle">
             <span>Special angles</span>
             <div>
-              {specialAngles.map((specialAngle) => (
+              {(isSlideSplit ? [0, 30, 45, 60, 90, 180, 270, 360] : specialAngles).map((specialAngle) => (
                 <button
                   type="button"
                   className={angle === specialAngle ? 'active' : ''}

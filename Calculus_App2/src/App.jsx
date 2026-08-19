@@ -6,6 +6,7 @@ import ChapterMenu from './components/ChapterMenu'
 import FundamentalReviewPage from './components/review/FundamentalReviewPage'
 import StudentProjectSystem from './project/StudentProjectSystem'
 import usePersistentState from './hooks/usePersistentState'
+import StudentFeedbackPrompt from './components/feedback/StudentFeedbackPrompt'
 import './App.css'
 
 const Lecture1201 = lazy(() => import('./lectures/chapter12/Lecture1201'))
@@ -13,6 +14,9 @@ const LectureJsonPage = lazy(() => import('./lectures/chapter12/LectureJsonPage'
 const TrigonometryReview = lazy(() => import('./reviews/fundamental/TrigonometryReview'))
 const AnglesRadiansLesson = lazy(() => import('./reviews/fundamental/AnglesRadiansLesson'))
 const UnitCircleLesson = lazy(() => import('./reviews/fundamental/UnitCircleLesson'))
+const SixTrigFunctionsLesson = lazy(() => import('./reviews/fundamental/SixTrigFunctionsLesson'))
+const CofunctionLesson = lazy(() => import('./reviews/fundamental/CofunctionLesson'))
+const AdvancedTrigLesson = lazy(() => import('./reviews/fundamental/AdvancedTrigLesson'))
 const TrigReadinessReview = lazy(() => import('./reviews/calculus2/TrigReadinessReview'))
 const LimitsReadinessReview = lazy(() => import('./reviews/calculus2/LimitsReadinessReview'))
 const DerivativesReadinessReview = lazy(() => import('./reviews/calculus2/DerivativesReadinessReview'))
@@ -36,6 +40,9 @@ const defaultReviewProgress = {
   trig: {},
   trigAngles: {},
   trigUnitCircle: {},
+  trigSixFunctions: {},
+  trigCofunctions: {},
+  trigAdvanced: {},
   limits: {},
   continuity: {},
   derivatives: {},
@@ -50,6 +57,11 @@ const defaultReviewProgress = {
   // Preserved for compatibility with progress saved by earlier builds.
   calc3: {},
 }
+
+const reviewFeedbackTitles={
+  'fundamental-algebra':'Algebra Review','calc2-trig':'Trigonometry Review','trig-angles-radians':'Angles and Radians','trig-unit-circle':'Unit Circle','trig-six-functions':'Six Trigonometric Functions','trig-cofunctions':'Cofunction Relationships','trig-readiness-practice':'Trigonometry Practice','calc2-limits':'Limits Review','calc2-derivatives':'Derivatives Review','calc2-exp-log':'Exponential, Logarithmic, and Inverse Trig Review',
+}
+const isReviewModuleView=(view)=>view==='fundamental-algebra'||view.startsWith('trig-')||view.startsWith('calc2-')||view.startsWith('calc3-')
 
 function scrollAndFocusMain() {
   const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
@@ -72,6 +84,17 @@ const sharedReviewPaths = {
   'calc2-trig': 'trigonometry',
   'trig-angles-radians': 'trigonometry/angles-radians',
   'trig-unit-circle': 'trigonometry/unit-circle',
+  'trig-six-functions': 'trigonometry/six-functions',
+  'trig-cofunctions': 'trigonometry/cofunctions',
+  'trig-advanced-pythagorean-identities':'trigonometry/pythagorean-identities',
+  'trig-advanced-symmetry':'trigonometry/symmetry',
+  'trig-advanced-graphs':'trigonometry/graphs',
+  'trig-advanced-periodicity':'trigonometry/periodicity',
+  'trig-advanced-transformations':'trigonometry/transformations',
+  'trig-advanced-angle-identities':'trigonometry/angle-identities',
+  'trig-advanced-combined-sinusoid':'trigonometry/combined-sinusoid',
+  'trig-advanced-inverse-trig':'trigonometry/inverse-trig',
+  'trig-advanced-hyperbolic':'trigonometry/hyperbolic',
   'trig-readiness-practice': 'trigonometry/practice',
   'calc2-limits': 'calculus-i/limits',
   'calc2-derivatives': 'calculus-i/derivatives',
@@ -93,6 +116,8 @@ function getCombinedTrigProgress(progress) {
     ['unit-circle-exact-practice', progress.trigUnitCircle?.exactPractice],
     ['unit-circle-guided-practice', progress.trigUnitCircle?.practice],
     ['unit-circle-mastery', progress.trigUnitCircle?.mastery],
+    ['six-functions-reviewed', progress.trigSixFunctions?.reviewed],
+    ['cofunctions-reviewed', progress.trigCofunctions?.reviewed],
   ]
 
   lessonGoals.forEach(([key, complete]) => {
@@ -124,6 +149,7 @@ function parseRouteHash(hash) {
   if (path === '/calc2/review' || path === '/calc3/review' || path === '/review-center') {
     return { view: 'review-path', courseId: null }
   }
+  if (path === '/instructor') return { view: 'instructor', courseId: null }
   if (path === '/instructor/live') return { view: 'instructor-live', courseId: null }
   if (path.startsWith('/instructor/join')) return { view: 'instructor-join', courseId: null }
   if (path === '/instructor/mock/live') return { view: 'instructor-mock-live', courseId: null }
@@ -261,13 +287,16 @@ function App() {
         <Suspense fallback={<div className="lecture-loading" role="status">Preparing the trigonometry review…</div>}>
           <TrigonometryReview
             completed={sharedReviewProgress.trig}
-            totalActivities={23}
+            totalActivities={25}
             onReviewHome={() => navigate('review-path', null)}
             onHome={() => navigate('home', null)}
             onPrevious={() => navigate('fundamental-algebra', null)}
             onNext={() => navigate('calc2-limits', null)}
             onOpenAngles={() => navigate('trig-angles-radians', null)}
             onOpenUnitCircle={() => navigate('trig-unit-circle', null)}
+            onOpenSixFunctions={() => navigate('trig-six-functions', null)}
+            onOpenCofunctions={() => navigate('trig-cofunctions', null)}
+            onOpenModule={(id) => navigate(`trig-advanced-${id}`,null)}
             onOpenPractice={() => navigate('trig-readiness-practice', null)}
           />
         </Suspense>
@@ -294,7 +323,34 @@ function App() {
             onReviewHome={() => navigate('review-path', null)}
             onHome={() => navigate('home', null)}
             onPrevious={() => navigate('trig-angles-radians', null)}
+            onNext={() => navigate('trig-six-functions', null)}
             onPractice={() => navigate('trig-readiness-practice', null)}
+          />
+        </Suspense>
+      )}
+      {view === 'trig-six-functions' && (
+        <Suspense fallback={<div className="lecture-loading" role="status">Preparing the six trigonometric functions lesson…</div>}>
+          <SixTrigFunctionsLesson
+            completed={reviewProgress.trigSixFunctions}
+            onCompletedChange={(value) => updateProgress('trigSixFunctions', value)}
+            onOverview={() => navigate('calc2-trig', null)}
+            onReviewHome={() => navigate('review-path', null)}
+            onHome={() => navigate('home', null)}
+            onPrevious={() => navigate('trig-unit-circle', null)}
+            onNext={() => navigate('trig-cofunctions', null)}
+          />
+        </Suspense>
+      )}
+      {view === 'trig-cofunctions' && (
+        <Suspense fallback={<div className="lecture-loading" role="status">Preparing the cofunction relationships lesson…</div>}>
+          <CofunctionLesson
+            completed={reviewProgress.trigCofunctions}
+            onCompletedChange={(value) => updateProgress('trigCofunctions', value)}
+            onOverview={() => navigate('calc2-trig', null)}
+            onReviewHome={() => navigate('review-path', null)}
+            onHome={() => navigate('home', null)}
+            onPrevious={() => navigate('trig-six-functions', null)}
+            onNext={() => navigate('calc2-trig', null)}
           />
         </Suspense>
       )}
@@ -309,6 +365,7 @@ function App() {
           />
         </Suspense>
       )}
+      {view.startsWith('trig-advanced-')&&(()=>{const lessonId=view.replace('trig-advanced-',''),order=['pythagorean-identities','symmetry','graphs','periodicity','transformations','angle-identities','combined-sinusoid','inverse-trig','hyperbolic'],position=order.indexOf(lessonId);return <Suspense fallback={<div className="lecture-loading" role="status">Preparing the interactive trigonometry lesson…</div>}><AdvancedTrigLesson lessonId={lessonId} completed={reviewProgress.trigAdvanced} onCompletedChange={(value)=>updateProgress('trigAdvanced',value)} onOverview={()=>navigate('calc2-trig',null)} onHome={()=>navigate('home',null)} onPrevious={()=>navigate(position>0?`trig-advanced-${order[position-1]}`:'calc2-trig',null)} onNext={()=>navigate(position<order.length-1?`trig-advanced-${order[position+1]}`:'calc2-trig',null)}/></Suspense>})()}
       {view === 'calc2-limits' && (
         <Suspense fallback={<div className="lecture-loading" role="status">Preparing the limits review…</div>}>
           <LimitsReadinessReview
@@ -402,6 +459,7 @@ function App() {
           <LectureStudio lectureId="real-numbers" initialMode="edit" onBack={() => navigate('instructor', null)} />
         </Suspense>
       )}
+      {isReviewModuleView(view)&&<StudentFeedbackPrompt moduleId={`review:${view}`} moduleTitle={reviewFeedbackTitles[view]||view.replaceAll('-',' ')}/>}
     </Layout>
   )
 }

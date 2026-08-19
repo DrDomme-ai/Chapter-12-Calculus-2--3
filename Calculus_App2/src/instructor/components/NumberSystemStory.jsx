@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MathDisplay } from '../../components/MathDisplay'
+import { MathDisplay, MathInline } from '../../components/MathDisplay'
 
 const naturals = [1,2,3,4,5,6,7,8,9]
 const integers = [-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9]
@@ -43,10 +43,83 @@ function OpeningChallenges() {
   return <div className="opening-challenges"><p>Are the numbers we currently have enough?</p><div><MathDisplay>{'2-5=\\ ?'}</MathDisplay><MathDisplay>{'1\\div2=\\ ?'}</MathDisplay><MathDisplay>{'x^2=2'}</MathDisplay></div></div>
 }
 
-function SquareRootMystery() {
-  const [step,setStep]=useState(0),[proof,setProof]=useState(false)
-  const proofSteps=['Assume sqrt(2) = p/q in lowest terms.','p squared equals 2q squared, so p is even.','Write p = 2k. Then q squared is even, so q is even.','Both p and q are even: a contradiction.']
-  return <div className="sqrt-mystery"><div className="unit-square"><span>1</span><i/><b>d</b><em>1</em></div><div className="sqrt-reveal"><MathDisplay>{'1^2+1^2=d^2'}</MathDisplay>{step>=1&&<MathDisplay>{'d^2=2'}</MathDisplay>}{step>=2&&<MathDisplay>{'d=\\sqrt2'}</MathDisplay>}<button onClick={()=>setStep((value)=>Math.min(2,value+1))}>Reveal next step</button><button onClick={()=>setStep(0)}>Reset</button></div><button className="proof-toggle" onClick={()=>setProof((value)=>!value)}>{proof?'Hide proof':'Show proof'}</button>{proof&&<ol className="proof-steps">{proofSteps.map((item)=><li key={item}>{item}</li>)}<li><MathDisplay>{'\\boxed{\\sqrt2\\notin\\mathbb Q}'}</MathDisplay></li></ol>}</div>
+function SquareRootMystery({ revealCount = 0 }) {
+  const [localStep, setLocalStep] = useState(0)
+  const activeStep = Math.max(Math.min(revealCount, 2), localStep)
+
+  const revealNext = () => setLocalStep((current) => Math.min(2, Math.max(current, revealCount) + 1))
+  const toggleCompleteProof = () => setLocalStep((current) => (activeStep >= 2 && revealCount < 2 ? 1 : Math.max(current, 2)))
+
+  return (
+    <div className="sqrt-mystery">
+      <div
+        className="unit-square"
+        role="img"
+        aria-label="A one by one square with diagonal d from the top-left vertex, coordinate zero comma one, to the bottom-right vertex, coordinate one comma zero."
+      >
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <line className="unit-square-diagonal" x1="0" y1="0" x2="100" y2="100" vectorEffect="non-scaling-stroke" />
+        </svg>
+        <span className="unit-square-side unit-square-side-left">1</span>
+        <span className="unit-square-side unit-square-side-bottom">1</span>
+        <strong className="unit-square-diagonal-label">d</strong>
+      </div>
+
+      <div className="sqrt-reveal" aria-live="polite">
+        {activeStep === 0 && (
+          <div className="sqrt-proof-prompt">
+            <strong>How long is the diagonal?</strong>
+            <MathDisplay>{'d=\\ ?'}</MathDisplay>
+          </div>
+        )}
+
+        {activeStep === 1 && (
+          <section className="sqrt-proof-stage" aria-labelledby="sqrt2-step-one-title">
+            <span>STEP 1</span>
+            <h3 id="sqrt2-step-one-title">Find the diagonal length</h3>
+            <p>Apply the Pythagorean theorem and use the positive root because <MathInline>{'d>0'}</MathInline>.</p>
+            <MathDisplay>{'1^2+1^2=d^2\\Longrightarrow d^2=2\\Longrightarrow d=\\sqrt2'}</MathDisplay>
+          </section>
+        )}
+
+        {activeStep >= 2 && (
+          <section className="sqrt-proof-stage sqrt-proof-stage-contradiction" id="sqrt2-irrational-proof" aria-labelledby="sqrt2-step-two-title">
+            <span>STEP 2</span>
+            <h3 id="sqrt2-step-two-title">Prove the length is irrational</h3>
+            <div className="sqrt-proof-contradiction-body">
+              <p>
+                Assume <MathInline>{'\\sqrt2=\\frac ab'}</MathInline> in lowest terms, so <MathInline>{'a,b\\in\\mathbb Z'}</MathInline>, <MathInline>{'b\\ne0'}</MathInline>, and <MathInline>{'\\gcd(a,b)=1'}</MathInline>.
+              </p>
+              <div className="discrete-solution-math">
+                <MathDisplay>{'a^2=2b^2\\Longrightarrow a\\text{ is even},\\quad a=2k'}</MathDisplay>
+                <MathDisplay>{'4k^2=2b^2\\Longrightarrow b^2=2k^2\\Longrightarrow b\\text{ is even}'}</MathDisplay>
+              </div>
+              <p>
+                Thus 2 divides both <MathInline>{'a'}</MathInline> and <MathInline>{'b'}</MathInline>, contradicting the assumption that <MathInline>{'\\frac ab'}</MathInline> has no common factor.
+              </p>
+            </div>
+            <MathDisplay>{'\\boxed{d=\\sqrt2\\notin\\mathbb Q}'}</MathDisplay>
+          </section>
+        )}
+
+        {revealCount === 0 && (
+          <div className="sqrt-proof-controls">
+            <button type="button" onClick={revealNext} disabled={activeStep >= 2}>Reveal next proof step</button>
+            <button
+              type="button"
+              className="proof-toggle"
+              aria-expanded={activeStep >= 2}
+              aria-controls="sqrt2-irrational-proof"
+              onClick={toggleCompleteProof}
+            >
+              {activeStep >= 2 ? 'Hide complete proof' : 'Show complete proof'}
+            </button>
+            <button type="button" onClick={() => setLocalStep(0)}>Reset</button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }
 
 function FieldCompleteness() {
@@ -68,7 +141,7 @@ function RationalJoke() {
 
 export default function NumberSystemStory({ stage, revealCount = 0 }) {
   if(stage==='opening-challenges') return <OpeningChallenges/>
-  if(stage==='square-root-mystery') return <SquareRootMystery/>
+  if(stage==='square-root-mystery') return <SquareRootMystery revealCount={revealCount}/>
   if(stage==='field-completeness') return <FieldCompleteness/>
   if(stage==='dense-not-complete') return <DenseNotComplete/>
   if(stage==='structure-comparison') return <StructureComparison/>

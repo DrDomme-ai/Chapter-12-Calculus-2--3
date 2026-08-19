@@ -1,6 +1,6 @@
 export const projectChapters = {
-  calc2: ['Chapter 7 — Integration Techniques', 'Chapter 8 — Applications of Integrals', 'Chapter 9 — Parametric and Polar Calculus', 'Chapter 10 — Sequences and Series', 'Chapter 11 — Power Series', 'Chapter 12 — Vectors and Three-Dimensional Space'],
-  calc3: ['Chapter 12 — Vectors and Three-Dimensional Space', 'Chapter 13 — Vector Functions', 'Chapter 14 — Partial Derivatives', 'Chapter 15 — Multiple Integrals', 'Chapter 16 — Vector Calculus'],
+  calc2: ['Chapter 7 — Integration Techniques', 'Chapter 8 — Applications of Integrals', 'Chapter 9 — Parametric and Polar Calculus', 'Chapter 10 — Sequences and Series', 'Chapter 11 — Power Series', 'Chapter 12 — Vectors and the Geometry of Space'],
+  calc3: ['Chapter 12 — Vectors and the Geometry of Space', 'Chapter 13 — Vector Functions', 'Chapter 14 — Partial Derivatives', 'Chapter 15 — Multiple Integrals', 'Chapter 16 — Vector Calculus', 'Chapter 17 — Second-Order Differential Equations'],
 }
 
 export const projectFormats = [
@@ -33,4 +33,3 @@ export const detailedQuestions = [
   'Give one specific suggestion for improving the project.',
   'Could the author teach this chapter effectively? Explain why or why not.',
 ]
-

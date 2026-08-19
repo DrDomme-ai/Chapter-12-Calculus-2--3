@@ -1,0 +1,135 @@
+.six-functions-lesson-page { --six-soft: color-mix(in srgb, var(--accent-light) 11%, var(--surface)); }
+.six-functions-hero .angles-radians-hero-grid > *,
+.cofunction-hero .angles-radians-hero-grid > * { min-width: 0; }
+.six-functions-hero aside,
+.cofunction-hero aside { max-width: 100%; box-sizing: border-box; }
+.six-functions-hero h1 { max-width: 830px; font-size: clamp(3rem, 7.5vw, 6.7rem); }
+.six-functions-time { margin-top: 13px; color: var(--accent-light) !important; font-size: .78rem !important; font-weight: 850; letter-spacing: .04em; }
+.six-functions-hero aside strong { font-size: clamp(2rem, 4vw, 3.2rem); line-height: 1; overflow-wrap: anywhere; }
+.six-functions-section-nav { grid-template-columns: repeat(8,minmax(0,1fr)); }
+.six-diagnostic-wrap { width: min(1080px,calc(100% - 40px)); margin: 35px auto 0; padding: clamp(18px,3vw,30px); border: 1px solid var(--border); border-radius: 18px; background: var(--surface); box-shadow: 0 18px 45px rgba(16,42,54,.08); scroll-margin-top: 80px; }
+.six-diagnostic-wrap > .secondary-button { margin-top: 15px; }
+.six-foundation-note { margin-top: 17px; padding: 16px 19px; display: flex; align-items: center; gap: 14px; border-left: 4px solid var(--accent); border-radius: 0 10px 10px 0; background: var(--six-soft); }
+.six-foundation-note strong { color: var(--primary); white-space: nowrap; }
+.six-foundation-note span { color: var(--text-secondary); }
+
+.six-tangent-discovery { margin-top: 20px; padding: clamp(20px,3vw,30px); display: grid; grid-template-columns: minmax(220px,.7fr) minmax(340px,1.3fr); align-items: center; gap: 20px; border: 1px solid color-mix(in srgb,var(--warning) 42%,var(--border)); border-radius: 16px; background: color-mix(in srgb,var(--warning) 7%,var(--surface)); }
+.six-tangent-discovery h3 { margin: 5px 0; color: var(--primary); }
+.six-tangent-discovery p { margin: 0; color: var(--text-secondary); line-height: 1.55; }
+.six-tangent-discovery .math-display { margin: 8px 0; overflow-x: auto; }
+.six-tangent-discovery > strong { grid-column: 1 / -1; padding-top: 14px; border-top: 1px solid var(--border); color: var(--primary); font-size: 1.03rem; }
+
+.six-denominator-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.six-denominator-grid article { min-width: 0; padding: clamp(18px,3vw,28px); border: 1px solid var(--border); border-radius: 15px; background: var(--surface); }
+.six-denominator-grid article > .math-display { color: var(--accent); font-size: 1.1rem; }
+.six-denominator-grid article > div { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.six-denominator-grid article > div .math-display { min-width: 0; margin: 0; padding: 12px 8px; border-radius: 9px; background: var(--background); font-size: .9rem; overflow-x: auto; }
+.six-denominator-grid strong { display: block; margin-top: 17px; color: var(--primary); }
+.six-denominator-grid p:last-child { margin-bottom: 0; color: var(--text-secondary); line-height: 1.55; }
+.six-denominator-rule { margin: 16px 0 24px; padding: 14px; border: 2px solid var(--warning); border-radius: 12px; background: color-mix(in srgb,var(--warning) 8%,var(--surface)); color: var(--primary); }
+.six-denominator-rule .math-display { margin: 0; overflow-x: auto; }
+
+.six-value-practice,.six-functions-check,.six-survival-challenge { margin-top: 22px; padding: clamp(20px,3vw,31px); border: 1px solid var(--border); border-radius: 17px; background: var(--surface); box-shadow: 0 13px 36px rgba(16,42,54,.06); }
+.six-value-practice h3,.six-functions-check h3,.six-survival-challenge h3 { margin: 5px 0 8px; color: var(--primary); font-size: clamp(1.35rem,3vw,1.9rem); }
+.six-value-practice header > p:not(.trig-lesson-label),.six-functions-check header > p:not(.trig-lesson-label),.six-survival-challenge header > p:not(.trig-lesson-label) { color: var(--text-secondary); line-height: 1.55; }
+.six-value-grid { margin-top: 22px; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+.six-value-grid label { min-width: 0; padding: 13px; display: grid; gap: 8px; border: 1px solid var(--border); border-radius: 11px; color: var(--primary); font-weight: 800; }
+.six-value-grid input,.six-check-expression input { width: 100%; min-width: 0; padding: 11px 12px; border: 1px solid var(--border); border-radius: 8px; background: white; color: var(--text-primary); font: inherit; box-sizing: border-box; }
+.six-value-grid input[aria-invalid='true'],.six-check-expression input[aria-invalid='true'] { border-color: var(--warning); }
+.six-value-grid small { font-size: .72rem; line-height: 1.45; }
+.six-value-grid small.is-correct,.six-practice-result.is-correct { color: var(--success); }
+.six-value-grid small.is-incorrect,.six-practice-result.is-incorrect { color: color-mix(in srgb,var(--warning) 75%,var(--primary)); }
+.six-practice-result { margin: 13px 0 0; font-weight: 800; }
+.six-practice-solution { margin-top: 15px; padding: 17px; border-left: 4px solid var(--success); background: color-mix(in srgb,var(--success) 7%,var(--surface)); }
+.six-practice-solution > div { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.six-practice-solution > div > div { min-width: 0; padding: 10px; border: 1px solid var(--border); border-radius: 8px; }
+.six-practice-solution p { color: var(--text-secondary); }
+.six-practice-solution .math-display { overflow-x: auto; }
+
+.six-check-question-list { margin-top: 20px; display: grid; gap: 13px; }
+.six-check-question-list fieldset { min-width: 0; padding: 17px; border: 1px solid var(--border); border-radius: 12px; }
+.six-check-question-list legend { padding: 0 7px; color: var(--primary); font-weight: 850; }
+.six-check-question-list legend span { margin-right: 10px; color: var(--accent); font-size: .72rem; }
+.six-check-options { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.six-check-options label { min-width: 0; min-height: 48px; padding: 10px 12px; display: flex; align-items: center; gap: 9px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; }
+.six-check-options label.is-selected { border-color: var(--accent); background: var(--six-soft); }
+.six-check-options input { accent-color: var(--accent); }
+.six-check-expression { max-width: 430px; display: grid; gap: 7px; color: var(--primary); font-weight: 800; }
+.six-check-feedback { margin-top: 10px; padding: 11px 13px; border-radius: 8px; background: var(--background); }
+.six-check-feedback p { margin: 4px 0 0; color: var(--text-secondary); line-height: 1.5; }
+.six-check-feedback.is-correct strong { color: var(--success); }
+.six-check-feedback.is-incorrect strong { color: color-mix(in srgb,var(--warning) 80%,var(--primary)); }
+.six-check-score { margin-top: 17px; padding: 15px; display: flex; align-items: center; gap: 15px; border: 1px solid var(--warning); border-radius: 10px; background: color-mix(in srgb,var(--warning) 7%,var(--surface)); }
+.six-check-score.is-passed { border-color: var(--success); background: color-mix(in srgb,var(--success) 7%,var(--surface)); }
+.six-check-score > span { min-width: 64px; color: var(--primary); font-size: 1.6rem; font-weight: 900; }
+.six-check-score p { margin: 3px 0 0; color: var(--text-secondary); }
+.six-check-prior-result { margin: 14px 0 0; color: var(--text-secondary); font-size: .8rem; font-weight: 800; }
+
+.six-survival-angle-tabs { margin: 18px 0; display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 7px; }
+.six-survival-angle-tabs button { min-height: 46px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--primary); cursor: pointer; }
+.six-survival-angle-tabs button[aria-pressed='true'] { border-color: var(--accent); background: var(--accent); color: white; }
+.six-survival-core { display: grid; grid-template-columns: 280px minmax(0,1fr); gap: 24px; align-items: center; }
+.six-survival-axis { position: relative; aspect-ratio: 1; display: grid; place-items: end center; border: 1px solid var(--border); border-radius: 50%; background: radial-gradient(circle at center,transparent 58%,var(--six-soft) 59% 61%,transparent 62%); overflow: hidden; }
+.six-survival-axis .horizontal,.six-survival-axis .vertical { position: absolute; background: var(--primary); opacity: .55; }
+.six-survival-axis .horizontal { top: 50%; left: 9%; width: 82%; height: 2px; }
+.six-survival-axis .vertical { top: 9%; left: 50%; width: 2px; height: 82%; }
+.six-survival-axis .point { position: absolute; width: 18px; height: 18px; border: 3px solid white; border-radius: 50%; background: var(--warning); box-shadow: 0 0 0 2px var(--primary); z-index: 2; }
+.six-survival-axis .point--right { right: 7%; top: calc(50% - 9px); }.six-survival-axis .point--top { top: 7%; left: calc(50% - 9px); }.six-survival-axis .point--left { left: 7%; top: calc(50% - 9px); }.six-survival-axis .point--bottom { bottom: 7%; left: calc(50% - 9px); }
+.six-survival-axis .math-display { position: relative; z-index: 3; width: 100%; margin: 0; padding: 7px; background: rgba(255,255,255,.88); font-size: .7rem; overflow-x: auto; }
+.six-function-selector { margin-bottom: 14px; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+.six-function-selector label { min-height: 45px; padding: 8px; display: flex; align-items: center; gap: 7px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; }
+.six-function-selector label.is-selected { border-color: var(--accent); background: var(--six-soft); }
+.six-survival-feedback { margin-top: 14px; padding: 14px; border-left: 4px solid var(--warning); background: color-mix(in srgb,var(--warning) 7%,var(--surface)); }
+.six-survival-feedback.is-correct { border-left-color: var(--success); background: color-mix(in srgb,var(--success) 7%,var(--surface)); }
+.six-survival-feedback p { color: var(--text-secondary); }
+.six-survival-progress { color: var(--text-secondary); font-size: .78rem; font-weight: 800; text-align: right; }
+
+.six-mistake-summary { margin-top: 18px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.six-mistake-summary summary { padding: 15px 18px; color: var(--primary); font-weight: 900; cursor: pointer; }
+.six-mistake-summary ol { margin: 0; padding: 0 30px 20px 48px; }
+.six-mistake-summary li { margin: 9px 0; padding-left: 6px; color: var(--text-secondary); }
+.six-mistake-summary li p { margin: 0 0 4px; }
+.six-visual-summary { padding: clamp(22px,4vw,38px); border: 1px solid var(--border); border-radius: 18px; background: linear-gradient(135deg,var(--surface),var(--six-soft)); text-align: center; }
+.six-summary-foundations { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+.six-summary-foundations .math-display { margin: 0; padding: 20px; border: 2px solid var(--accent); border-radius: 12px; color: var(--primary); font-size: 1.5rem; }
+.six-visual-summary > span { display: block; margin: 15px; color: var(--text-secondary); font-size: .7rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.six-visual-summary > div:nth-of-type(2) { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; }
+.six-visual-summary > div:nth-of-type(2) .math-display { min-width: 0; margin: 0; padding: 13px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface); overflow-x: auto; }
+.six-visual-summary > strong { display: block; margin-top: 24px; color: var(--primary); font-size: clamp(1.5rem,4vw,2.7rem); letter-spacing: -.03em; text-transform: uppercase; }
+.six-calculus-connection { margin-top: 16px; padding: 20px; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 20px; border-left: 4px solid var(--accent); background: var(--six-soft); }
+.six-calculus-connection p { margin: 5px 0 0; color: var(--text-secondary); line-height: 1.55; }
+.six-calculus-connection ul { margin: 0; columns: 2; color: var(--primary); }
+.six-completion-card { margin-top: 18px; padding: clamp(22px,4vw,35px); display: grid; grid-template-columns: 1fr 1fr; gap: 28px; border-radius: 18px; background: var(--primary); color: white; }
+.six-completion-card h3 { margin: 6px 0 12px; color: white; font-size: 1.5rem; }
+.six-completion-card ul { margin: 0; padding: 0; display: grid; gap: 7px; list-style: none; }
+.six-completion-card > div:last-child { padding: 18px; border: 1px solid rgba(255,255,255,.25); border-radius: 12px; background: rgba(255,255,255,.07); }
+.six-completion-card > div:last-child > span { color: var(--accent-light); font-size: .72rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.six-completion-card .math-display { color: white; overflow-x: auto; }
+.six-functions-lesson-page .angles-next-actions { flex-wrap: wrap; }
+
+@media (max-width: 900px) {
+  .six-functions-section-nav { grid-template-columns: repeat(4,minmax(0,1fr)); }
+  .six-tangent-discovery,.six-completion-card { grid-template-columns: 1fr; }
+  .six-tangent-discovery > strong { grid-column: auto; }
+  .six-survival-core { grid-template-columns: 240px minmax(0,1fr); }
+}
+@media (max-width: 680px) {
+  .six-functions-hero,
+  .cofunction-hero { overflow-x: hidden; box-sizing: border-box; }
+  .six-functions-hero .angles-radians-hero-grid,
+  .cofunction-hero .angles-radians-hero-grid { width: 90vw; max-width: 90vw; }
+  .six-functions-hero .angles-radians-hero-grid > div > p,
+  .cofunction-hero .angles-radians-hero-grid > div > p { width: calc(100vw - 50px); max-width: calc(100vw - 50px); overflow-wrap: normal; }
+  .six-functions-hero h1 { font-size: clamp(2.5rem,12vw,3.2rem); overflow-wrap: anywhere; }
+  .six-diagnostic-wrap { width: calc(100% - 22px); }
+  .six-foundation-note { align-items: flex-start; flex-direction: column; }
+  .six-denominator-grid,.six-value-grid,.six-practice-solution > div,.six-check-options,.six-summary-foundations,.six-visual-summary > div:nth-of-type(2),.six-calculus-connection { grid-template-columns: 1fr; }
+  .six-survival-core { grid-template-columns: 1fr; }
+  .six-survival-axis { width: min(100%,320px); margin-inline: auto; }
+  .six-function-selector { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .six-calculus-connection ul { columns: 1; }
+  .six-functions-section-nav { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .six-functions-lesson-page * { scroll-behavior: auto !important; }
+}

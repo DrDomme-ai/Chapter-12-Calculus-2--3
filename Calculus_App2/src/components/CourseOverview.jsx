@@ -109,22 +109,14 @@ export default function CourseOverview({
               const isAvailable = chapter.status === 'available'
 
               return (
-                <article className="course-overview__chapter-card" key={chapter.id}>
-                  <span className="course-overview__chapter-id" aria-label={`Content identifier ${chapter.id}`}>
-                    {chapter.id.length === 2 ? chapter.id : '—'}
-                  </span>
-                  <div>
-                    {chapter.chapterLabel && <p>{chapter.chapterLabel}</p>}
-                    <h3>{chapter.title}</h3>
+                <details className="course-overview__chapter-accordion" key={chapter.id}>
+                  <summary><span>{chapter.chapterLabel}</span><strong>{chapter.title}</strong></summary>
+                  <div className="course-overview__chapter-contents">
+                    {chapter.subchapters?.length?<ul>{chapter.subchapters.map((subchapter)=><li key={subchapter}>{subchapter}</li>)}</ul>:<p>Lectures will appear here as chapter materials are added.</p>}
+                    {chapter.chapterLabel==='CHAPTER 12'&&<button type="button" onClick={onOpenChapter}>Open Chapter 12</button>}
+                    {!isAvailable&&<small>Planned</small>}
                   </div>
-                  <button
-                    type="button"
-                    onClick={isAvailable ? onOpenChapter : undefined}
-                    disabled={!isAvailable}
-                  >
-                    {isAvailable ? 'Open' : 'Planned'}
-                  </button>
-                </article>
+                </details>
               )
             })}
           </div>

@@ -1,5 +1,9 @@
 import { trigonometryLecture } from './trigonometryLecture'
 import { hyperbolicLecture, inverseTrigLecture } from './calculus2TrigLectures'
+import { geometryLecture } from './geometryLecture'
+import { applyLectureRequirements } from '../services/lectureRequirements'
+import { exponentialGrowthLecture } from './exponentialGrowthLecture'
+import { chapter121Lecture, chapter122Lecture, chapter123Lecture } from './chapter12Lectures'
 
 const note = (type, title, content, math) => ({ type, title, content, math })
 
@@ -125,7 +129,28 @@ const mathematicalStorySlides = [
   slide('rn-story-rationals','definition','Rational numbers',[{kind:'math',value:'\\mathbb Q=\\left\\{\\frac pq:p,q\\in\\mathbb Z,\\ q\\ne0\\right\\}'},{kind:'text',value:'A rational number is a ratio of integers.'},{kind:'math',value:'3=\\frac31\\qquad\\mathbb Z\\subset\\mathbb Q'}],{visualization:'number-story:rational-objects',presenterNotes:[note('important','Notation','Emphasize q is not zero and every integer is rational.')] }),
   slide('rn-story-reciprocal','visualization','Reciprocal explorer',[],{visualization:'number-story:rational-inverse',presenterNotes:[note('formula','Multiplicative inverse','','\\frac ab\\cdot\\frac ba=1'),note('example','Examples','Use 2/3 times 3/2 and 3 times 1/3.')] }),
   slide('rn-story-field','property','The rational numbers form a field',[{kind:'math',value:'\\boxed{\\mathbb Q\\text{ is a field}}'},{kind:'text',value:'Within Q, we can add, subtract, multiply, and divide by any nonzero number and stay inside Q.'}],{presenterNotes:[note('important','Mathematical accuracy','Do not say irrational numbers are required to make a field. Q is already a field.'),note('detail','Instructor sheet','Use the formal field axioms here if the class is ready; keep them off the default projector view.')] }),
-  slide('rn-story-challenge-three','derivation','Return to challenge 3',[{kind:'math',value:'x^2=2'}],{visualization:'number-story:square-root-mystery',presenterNotes:[note('script','What to say','This very simple square produces a number that caused a serious historical problem.'),note('proof','Optional proof','The Show Proof control reveals the contradiction argument. Do not show it by default.')] }),
+  slide('rn-story-challenge-three', 'derivation', 'Return to challenge 3', [{ kind: 'math', value: 'x^2=2' }], {
+    visualization: 'number-story:square-root-mystery',
+    revealSteps: [
+      'Step 1 — derive the diagonal length with the Pythagorean theorem',
+      'Step 2 — prove that the diagonal length is irrational by contradiction',
+    ],
+    presenterNotes: [
+      note('script', 'What to say', 'This very simple square produces a number that caused a serious historical problem.'),
+      note(
+        'proof',
+        'Step 1 — Diagonal length',
+        'The diagonal is a length, so take the positive square root.',
+        String.raw`1^2+1^2=d^2\Longrightarrow d^2=2\Longrightarrow d=\sqrt2`,
+      ),
+      note(
+        'proof',
+        'Step 2 — Irrationality by contradiction',
+        'Assume a/b is fully reduced. Since a squared is even, a is even, so write a = 2k. Substitution then makes b squared even, hence b is even. Thus 2 divides both a and b, contradicting that the fraction was in lowest terms. Therefore the diagonal length is irrational.',
+        String.raw`\sqrt2=\frac ab,\ \gcd(a,b)=1\Longrightarrow a^2=2b^2\Longrightarrow a=2k\Longrightarrow b^2=2k^2\Longrightarrow\sqrt2\notin\mathbb Q`,
+      ),
+    ],
+  }),
   slide('rn-story-sqrt-prediction','live-question','The mystery of sqrt(2)',[{kind:'math',value:'\\sqrt2=\\frac pq\\ ?\\qquad p,q\\in\\mathbb Z,\\ q\\ne0'}],{question:{type:'multiple-choice',prompt:'Can sqrt(2) be written exactly as p/q for integers p and q, q not zero?',options:['Yes','No','Only approximately','Not enough information'],correctAnswer:1},presenterNotes:[note('pause','Do not reveal immediately','Collect predictions and allow discussion.'),note('answer','Reveal after discussion','sqrt(2) is not rational.')] }),
   slide('rn-story-irrational','definition','Irrational numbers are real',[{kind:'text',value:'An irrational number is a real number that cannot be expressed as p/q with integers p and q, q not zero.'},{kind:'math',value:'\\sqrt2,\\qquad\\sqrt3,\\qquad\\pi,\\qquad e'},{kind:'callout',value:'Irrational does not mean not real.'}],{visualization:'number-story:irrationals',presenterNotes:[note('common-mistake','Language','Irrational numbers are real numbers.')] }),
   slide('rn-story-finished','section','Are we finished?',[{kind:'math',value:'1,\\quad1.4,\\quad1.41,\\quad1.414,\\quad1.4142,\\quad1.41421,\\ldots\\longrightarrow\\sqrt2'},{kind:'text',value:'Every displayed finite decimal is rational. The limiting value is irrational.'}],{visualization:'number-story:sqrt2',presenterNotes:[note('ask','Ask','What do you notice?'),note('teaching','Key distinction','Approximation and density do not guarantee the limiting value belongs to Q.')] }),
@@ -164,6 +189,8 @@ const shell = (id, title, course, chapter, topics) => ({
 
 export const lectureCatalog = [
   realNumbersLecture,
+  exponentialGrowthLecture,
+  geometryLecture,
   trigonometryLecture,
   inverseTrigLecture,
   hyperbolicLecture,
@@ -171,12 +198,17 @@ export const lectureCatalog = [
   shell('continuity', 'Continuity', 'Calculus II', 'Calculus I Foundations', ['The three continuity conditions', 'Removable discontinuities and piecewise functions', 'Intermediate Value Theorem connections']),
   shell('derivatives', 'Derivatives', 'Calculus II', 'Calculus I Foundations', ['Secant lines approaching a tangent', 'Derivative as a limit and geometric rate', 'Derivative rules and higher derivatives']),
   shell('integrals', 'Integrals', 'Calculus II', 'Calculus I Foundations', ['Antiderivatives and +C', 'Riemann sums and signed accumulation', 'Fundamental Theorem of Calculus']),
-  shell('chapter-12-1', '12.1 Three-Dimensional Coordinate Systems', 'Calculus II & III', 'Chapter 12', ['R → R² → R³', 'Axes, planes, octants, points, and projections', 'Distance, spheres, surfaces, and solids']),
-  shell('chapter-12-2', '12.2 Vectors', 'Calculus II & III', 'Chapter 12', ['Geometric vectors, magnitude, and direction', 'Addition and scalar multiplication', 'Components, basis vectors, and position vectors']),
-  shell('chapter-12-3', '12.3 Dot Product', 'Calculus II & III', 'Chapter 12', ['Dot product and angle', 'Orthogonality and direction cosines', 'Projections and work']),
+  chapter121Lecture,
+  chapter122Lecture,
+  chapter123Lecture,
   shell('chapter-12-4', '12.4 Cross Product', 'Calculus II & III', 'Chapter 12', ['Cross product and the right-hand rule', 'Area, volume, and coplanarity', 'Scalar triple product and torque']),
   shell('chapter-12-5', '12.5 Lines and Planes', 'Calculus II & III', 'Chapter 12', ['Vector, parametric, and symmetric line equations', 'Planes and normal vectors', 'Angles and point-plane distance']),
   shell('chapter-12-6', '12.6 Cylinders and Quadric Surfaces', 'Calculus II & III', 'Chapter 12', ['Traces and cylinders', 'Ellipsoids, paraboloids, and hyperboloids', 'Applications and interactive surfaces']),
+  shell('chapter-13-overview', '13: Vector Functions', 'Calculus II & III', 'Chapter 13', ['Vector-valued functions and space curves', 'Derivatives, integrals, velocity, and acceleration', 'Arc length, curvature, and motion in space']),
+  shell('chapter-14-overview', '14: Partial Derivatives', 'Calculus II & III', 'Chapter 14', ['Functions of several variables and level sets', 'Partial derivatives, tangent planes, and the chain rule', 'Directional derivatives, gradients, and optimization']),
+  shell('chapter-15-overview', '15: Multiple Integrals', 'Calculus II & III', 'Chapter 15', ['Double and triple integrals', 'Polar, cylindrical, and spherical coordinates', 'Applications, mass, moments, and change of variables']),
+  shell('chapter-16-overview', '16: Vector Calculus', 'Calculus II & III', 'Chapter 16', ['Vector fields and line integrals', 'Green’s theorem, curl, and divergence', 'Surface integrals and the fundamental integral theorems']),
+  shell('chapter-17-overview', '17: Second-Order Differential Equations', 'Calculus II & III', 'Chapter 17', ['Second-order linear differential equations', 'Homogeneous and nonhomogeneous solution methods', 'Oscillations, mechanical systems, and applications']),
 ]
 
-export const getLecture = (lectureId) => lectureCatalog.find((lecture) => lecture.id === lectureId) || realNumbersLecture
+export const getLecture = (lectureId) => applyLectureRequirements(lectureCatalog.find((lecture) => lecture.id === lectureId) || realNumbersLecture)
