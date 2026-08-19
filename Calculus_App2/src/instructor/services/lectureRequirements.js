@@ -68,5 +68,7 @@ export function applyLectureRequirements(lecture){
   ]
   const existingIds=new Set(instructionalSlides.map(item=>item.id))
   const welcome=inherited[0]
-  return {...lecture,masterRequirementsApplied:true,slides:[...(existingIds.has(welcome.id)?[]:[welcome]),...instructionalSlides,...inherited.slice(1).filter(item=>!existingIds.has(item.id))]}
+  const removed=new Set(lecture.removedSlideIds||[])
+  const assembled=[...(existingIds.has(welcome.id)?[]:[welcome]),...instructionalSlides,...inherited.slice(1).filter(item=>!existingIds.has(item.id))]
+  return {...lecture,masterRequirementsApplied:true,slides:assembled.filter(item=>!removed.has(item.id))}
 }

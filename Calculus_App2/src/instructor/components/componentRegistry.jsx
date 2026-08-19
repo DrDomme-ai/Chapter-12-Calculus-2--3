@@ -14,6 +14,8 @@ import GrowthDecayVisuals from './GrowthDecayVisuals'
 import TrigFunctionLookupExplorer from './TrigFunctionLookupExplorer'
 import InverseTrigBenchmarkExplorer from './InverseTrigBenchmarkExplorer'
 import SixTrigInverseMaster from './SixTrigInverseMaster'
+import Chapter12Explorers from './Chapter12Explorers'
+import '../styles/chapter12.css'
 
 export function RegisteredComponent({componentKey,revealCount=0,settings={}}) {
   if(componentKey==='additionAnimation') return <AdditionAnimation {...settings}/>
@@ -36,5 +38,6 @@ export function RegisteredComponent({componentKey,revealCount=0,settings={}}) {
   if(componentKey?.startsWith('lecture-hook:'))return <LectureHooks stage={componentKey.split(':')[1]}/>
   if(componentKey?.startsWith('geometry:'))return <GeometryExplorers stage={componentKey.split(':')[1]} revealCount={revealCount} {...settings}/>
   if(componentKey?.startsWith('growth-decay:'))return <GrowthDecayVisuals stage={componentKey.split(':')[1]} settings={settings}/>
+  if(componentKey?.startsWith('chapter12:'))return <Chapter12Explorers stage={componentKey.split(':')[1]} revealCount={revealCount}/>
   return <div className="editor-placeholder"><strong>{componentKey||'Custom component'}</strong><span>Registered lecture component</span></div>
 }

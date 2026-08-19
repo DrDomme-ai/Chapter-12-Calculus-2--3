@@ -10,6 +10,17 @@ export function loadLecture(lectureId, sourceSlides) {
       const canonical=sourceSlides.find(slide=>slide.id==='it-inverse-trig-integrals')
       if(canonical){const exitIndex=saved.findIndex(slide=>slide.id==='it-exit');const insertAt=Math.min(18,exitIndex>=0?exitIndex:saved.length);saved=[...saved.slice(0,insertAt),canonical,...saved.slice(insertAt)]}
     }
+    if(lectureId==='inverse-trigonometric-functions'&&saved?.length){
+      const removedIds=new Set(['it-title','it-motivation','it-motivation-solution','it-notation-solution','it-live','it-live-solution'])
+      const refreshIds=new Set(['it-arcsin-examples','it-compositions','it-arcsin-derivative','it-arccos-examples','it-arctan-examples','it-composition-examples','it-derivative-examples'])
+      const savedById=new Map(saved.filter(item=>!removedIds.has(item.id)).map(item=>[item.id,item]))
+      const sourceIds=new Set(sourceSlides.map(item=>item.id))
+      saved=[...sourceSlides.map(source=>{
+        const edited=savedById.get(source.id)
+        if(!edited)return source
+        return refreshIds.has(source.id)?{...edited,...source,elements:undefined}:edited
+      }),...saved.filter(item=>!removedIds.has(item.id)&&!sourceIds.has(item.id))]
+    }
     // Keep the instructor's saved layout, but refresh canonical teaching content
     // for Slide 14 after its proof and reveal sequence were corrected.
     const refreshRealNumbersChallenge = (slides) => {
@@ -50,7 +61,11 @@ export function loadLecture(lectureId, sourceSlides) {
       const sourceIds=new Set(sourceSlides.map((slide)=>slide.id))
       return [...sourceSlides.map((slide)=>byId.has(slide.id)?{...slide,...byId.get(slide.id),presenterNotes:slide.presenterNotes}:slide),...saved.filter((slide)=>!sourceIds.has(slide.id))]
     }
-    if(lectureId==='real-numbers'&&saved?.length&&!saved.some((slide)=>slide.id==='rn-field-vs-completeness')) return sourceSlides
+    if(lectureId==='real-numbers'&&saved?.length&&!saved.some((slide)=>slide.id==='rn-field-vs-completeness')){
+      const savedById=new Map(saved.map((slide)=>[slide.id,slide]))
+      const sourceIds=new Set(sourceSlides.map((slide)=>slide.id))
+      return [...sourceSlides.map((slide)=>savedById.get(slide.id)||slide),...saved.filter((slide)=>!sourceIds.has(slide.id))]
+    }
     // Geometry is maintained as a canonical instructor lecture. Refresh the
     // mathematical content, notes, questions, and reveal sequence while keeping
     // any element positions the instructor has adjusted in the editor.
@@ -75,7 +90,24 @@ export function loadLecture(lectureId, sourceSlides) {
     return refreshRealNumbersChallenge(saved||sourceSlides)
   } catch { return sourceSlides }
 }
-export function saveLecture(lectureId, slides) { localStorage.setItem(keyFor(lectureId), JSON.stringify(slides)) }
+export function saveLecture(lectureId, slides) {
+  localStorage.setItem(keyFor(lectureId), JSON.stringify(slides))
+  localStorage.setItem(`${keyFor(lectureId)}:saved-at`, new Date().toISOString())
+}
+
+export function downloadLectureBackup(lectureId, title, slides) {
+  const payload={format:'interactive-calculus-lecture',version:1,lectureId,title,savedAt:new Date().toISOString(),slides}
+  const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}))
+  const link=document.createElement('a');link.href=url;link.download=`${lectureId}-lecture-backup.json`;link.click()
+  setTimeout(()=>URL.revokeObjectURL(url),0)
+}
+
+export async function readLectureBackup(file, expectedLectureId) {
+  const payload=JSON.parse(await file.text())
+  if(payload?.format!=='interactive-calculus-lecture'||!Array.isArray(payload.slides))throw new Error('This is not a lecture backup file.')
+  if(payload.lectureId!==expectedLectureId)throw new Error(`This backup is for ${payload.title||payload.lectureId}, not this lecture.`)
+  return payload.slides
+}
 export const updateSlide = (slides,id,change) => slides.map((slide)=>slide.id===id?{...slide,...change}:slide)
 export const moveSlide = (slides,from,to) => { const copy=[...slides]; const [item]=copy.splice(from,1); copy.splice(to,0,item); return copy }
 export const updateElement = (slide,id,change) => ({...slide,elements:slide.elements.map((item)=>item.id===id?{...item,...change}:item)})
@@ -131,7 +163,11 @@ export function ensureElements(slide) {
   if (slide.elements) {
     // Typography normalization changes title styling only; it deliberately
     // preserves every saved coordinate, dimension, layer, and block order.
-    const normalizedElements=slide.elements.map((element)=>element.id===`${slide.id}-title`&&element.titleAutoFit!==false?{...element,fontSize:36}:element)
+    const normalizedElements=slide.elements.map((element)=>{
+      if(element.id===`${slide.id}-title`&&element.titleAutoFit!==false)return{...element,fontSize:36}
+      if(['text','math','definition','block','bullets','comparison'].includes(element.type))return{...element,fontSize:Math.max(22,Number(element.fontSize)||22)}
+      return element
+    })
     const normalizedSlide={...slide,elements:normalizedElements}
     const canonicalHook=/^(rn-story-hook|rn-story-joke|rn-story-final-question|trig-circle-wave-hook|it-curiosity-hook|hy-cable-hook)$/.test(slide.id)
     const squareRootProof=slide.id==='rn-story-challenge-three'
@@ -220,7 +256,7 @@ export function ensureElements(slide) {
     return {...slide,layoutMode:'slide',theme:slide.theme||'academic',elements:elements.map(element=>element.id===`${slide.id}-title`?{...element,x:6,y:5,width:88,height:11,fontSize:36,locked:false}:element.id===`${slide.id}-content-0`?{...element,x:6,y:17,width:88,height:7,fontSize:16,locked:false}:element.id===`${slide.id}-interactive`?{...element,x:6,y:25,width:88,height:69,component:'sixTrigInverseMaster',componentKey:'sixTrigInverseMaster',locked:false}:element)}
   }
   if(slide.id==='it-other-derivatives'){
-    return {...slide,layoutMode:'slide',theme:slide.theme||'academic',elements:elements.map(element=>element.id===`${slide.id}-title`?{...element,x:6,y:5,width:88,height:13,fontSize:36,locked:false}:element.id===`${slide.id}-content-0`?{...element,x:6,y:22,width:88,height:32,fontSize:14,autoSize:false,locked:false}:element.id===`${slide.id}-content-1`?{...element,x:6,y:59,width:88,height:33,fontSize:14,autoSize:false,locked:false}:element)}
+    return {...slide,layoutMode:'slide',theme:slide.theme||'academic',elements:elements.map(element=>element.id===`${slide.id}-title`?{...element,x:6,y:5,width:88,height:13,fontSize:36,locked:false}:element.id===`${slide.id}-content-0`?{...element,x:6,y:22,width:88,height:32,fontSize:22,autoSize:false,locked:false}:element.id===`${slide.id}-content-1`?{...element,x:6,y:59,width:88,height:33,fontSize:22,autoSize:false,locked:false}:element)}
   }
   if(slide.id==='it-inverse-trig-integrals'){
     return {...slide,layoutMode:'slide',theme:slide.theme||'academic',elements:elements.map(element=>element.id===`${slide.id}-title`?{...element,x:6,y:5,width:88,height:13,fontSize:32,locked:false}:element.id===`${slide.id}-content-0`?{...element,x:8,y:23,width:84,height:18,fontSize:20,autoSize:false,locked:false}:element.id===`${slide.id}-content-1`?{...element,x:8,y:47,width:84,height:18,fontSize:20,autoSize:false,locked:false}:element.id===`${slide.id}-content-2`?{...element,x:8,y:71,width:84,height:20,fontSize:18,autoSize:false,locked:false}:element)}

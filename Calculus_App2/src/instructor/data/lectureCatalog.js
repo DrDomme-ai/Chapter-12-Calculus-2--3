@@ -3,6 +3,7 @@ import { hyperbolicLecture, inverseTrigLecture } from './calculus2TrigLectures'
 import { geometryLecture } from './geometryLecture'
 import { applyLectureRequirements } from '../services/lectureRequirements'
 import { exponentialGrowthLecture } from './exponentialGrowthLecture'
+import { chapter121Lecture, chapter122Lecture, chapter123Lecture } from './chapter12Lectures'
 
 const note = (type, title, content, math) => ({ type, title, content, math })
 
@@ -197,9 +198,9 @@ export const lectureCatalog = [
   shell('continuity', 'Continuity', 'Calculus II', 'Calculus I Foundations', ['The three continuity conditions', 'Removable discontinuities and piecewise functions', 'Intermediate Value Theorem connections']),
   shell('derivatives', 'Derivatives', 'Calculus II', 'Calculus I Foundations', ['Secant lines approaching a tangent', 'Derivative as a limit and geometric rate', 'Derivative rules and higher derivatives']),
   shell('integrals', 'Integrals', 'Calculus II', 'Calculus I Foundations', ['Antiderivatives and +C', 'Riemann sums and signed accumulation', 'Fundamental Theorem of Calculus']),
-  shell('chapter-12-1', '12.1 Three-Dimensional Coordinate Systems', 'Calculus II & III', 'Chapter 12', ['R → R² → R³', 'Axes, planes, octants, points, and projections', 'Distance, spheres, surfaces, and solids']),
-  shell('chapter-12-2', '12.2 Vectors', 'Calculus II & III', 'Chapter 12', ['Geometric vectors, magnitude, and direction', 'Addition and scalar multiplication', 'Components, basis vectors, and position vectors']),
-  shell('chapter-12-3', '12.3 Dot Product', 'Calculus II & III', 'Chapter 12', ['Dot product and angle', 'Orthogonality and direction cosines', 'Projections and work']),
+  chapter121Lecture,
+  chapter122Lecture,
+  chapter123Lecture,
   shell('chapter-12-4', '12.4 Cross Product', 'Calculus II & III', 'Chapter 12', ['Cross product and the right-hand rule', 'Area, volume, and coplanarity', 'Scalar triple product and torque']),
   shell('chapter-12-5', '12.5 Lines and Planes', 'Calculus II & III', 'Chapter 12', ['Vector, parametric, and symmetric line equations', 'Planes and normal vectors', 'Angles and point-plane distance']),
   shell('chapter-12-6', '12.6 Cylinders and Quadric Surfaces', 'Calculus II & III', 'Chapter 12', ['Traces and cylinders', 'Ellipsoids, paraboloids, and hyperboloids', 'Applications and interactive surfaces']),
