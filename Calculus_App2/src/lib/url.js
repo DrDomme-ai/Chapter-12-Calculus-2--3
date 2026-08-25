@@ -9,6 +9,7 @@ export function getAppBaseUrl() {
 
 export function makeJoinUrl(joinCode) {
   const base = getAppBaseUrl()
-  // Use hash route for SPA compatibility: /#/join/<code>
-  return `${base}/#/join/${encodeURIComponent(String(joinCode))}`
+  // Student links must always use the public student route. Never expose an
+  // instructor URL in a QR code, copied link, or classroom projection.
+  return `${base}/#/student?code=${encodeURIComponent(String(joinCode))}`
 }

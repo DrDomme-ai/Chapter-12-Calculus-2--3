@@ -24,7 +24,8 @@ function ResponseDashboard({session,question}){
   if(!session)return <div className="response-dashboard"><strong>Private live-class dashboard</strong><p>Start a live lecture and ask a class question to collect responses.</p></div>
   const active=session.active_question||question,options=active?.options||[],responses=(session.responses||[]).filter(r=>r.question_id===active?.id)
   const eligible=active?.eligible_participant_ids?.length??session.participants.length,responded=new Set(responses.map(r=>r.participant_id)).size
-  const distribution=options.map((_,i)=>responses.filter(r=>Number(r.answer)===i).length),graded=responses.filter(r=>r.correct!=null),correct=graded.filter(r=>r.correct).length
+  const selected=(answer,index)=>Array.isArray(answer)?answer.map(Number).includes(index):Number(answer)===index
+  const distribution=options.map((_,i)=>responses.filter(r=>selected(r.answer,i)).length),graded=responses.filter(r=>r.correct!=null),correct=graded.filter(r=>r.correct).length
   const nonResponders=getNonResponders(session),participation=getParticipationStats(session).sort((a,b)=>b.participation-a.participation),topics=getTopicAccuracy(session)
   const confidenceQuestions=(session.questions||[]).filter(q=>q.category==='confidence'),confidenceResponses=(session.responses||[]).filter(r=>confidenceQuestions.some(q=>q.id===r.question_id))
   const reflections=(session.questions||[]).filter(q=>q.category==='reflection').flatMap(q=>(session.responses||[]).filter(r=>r.question_id===q.id).map(response=>({response,participant:session.participants.find(p=>p.id===response.participant_id)})))

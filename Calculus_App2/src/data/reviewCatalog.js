@@ -30,8 +30,8 @@ export const calc2PrerequisiteModules = [
     topics: ['Function language', 'Representations and families', 'Transformations, composition, and inverses'],
     progressKey: 'functions',
     routeId: 'calc2-functions',
-    status: 'planned',
-    questionTotal: 0,
+    status: 'available',
+    questionTotal: 6,
   }),
   makeModule({
     id: 'trigonometry-essentials',
@@ -66,8 +66,8 @@ export const calc2PrerequisiteModules = [
     topics: ['Continuity at a point', 'Types of discontinuity', 'Intermediate Value Theorem'],
     progressKey: 'continuity',
     routeId: 'calc2-continuity',
-    status: 'planned',
-    questionTotal: 0,
+    status: 'available',
+    questionTotal: 6,
   }),
   makeModule({
     id: 'derivatives',
@@ -90,8 +90,8 @@ export const calc2PrerequisiteModules = [
     topics: ['Critical numbers and extrema', 'Monotonicity and concavity', 'Optimization'],
     progressKey: 'derivativeApplications',
     routeId: 'calc2-derivative-applications',
-    status: 'planned',
-    questionTotal: 0,
+    status: 'available',
+    questionTotal: 3,
   }),
   makeModule({
     id: 'integrals',
@@ -102,8 +102,8 @@ export const calc2PrerequisiteModules = [
     topics: ['Area and accumulation', 'Fundamental Theorem of Calculus', 'Basic formulas and u-substitution'],
     progressKey: 'integrals',
     routeId: 'calc2-integrals',
-    status: 'planned',
-    questionTotal: 0,
+    status: 'available',
+    questionTotal: 3,
   }),
 ]
 

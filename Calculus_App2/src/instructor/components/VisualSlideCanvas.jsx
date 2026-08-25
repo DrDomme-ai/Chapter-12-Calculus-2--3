@@ -2,6 +2,7 @@
 import { MathDisplay } from '../../components/MathDisplay'
 import HybridMathText from '../../components/HybridMathText'
 import { RegisteredComponent } from './componentRegistry'
+import { getLectureSemantic } from '../services/lectureSemantics'
 
 const CardValue=({value})=>typeof value==='string'&&(/\\[a-zA-Z]+|[_^]/.test(value))?<MathDisplay>{value}</MathDisplay>:value
 
@@ -24,7 +25,44 @@ function ElementContent({ element, revealCount, editing, inlineEditing, onInline
   return <>{element.type === 'block' && <strong>{element.blockTitle || lines.shift()}</strong>}<HybridMathText source={lines.join('\n')}/></>
 }
 
+function CrossProductEndSlide({slide}){
+  const items=slide.presentationContent||[]
+  const intro=items.find(item=>item.kind==='text')?.value
+  const bullets=items.find(item=>item.kind==='list')?.value||[]
+  const callout=items.find(item=>item.kind==='callout')?.value
+  return <div data-slide-id={slide.id} className={`visual-slide-canvas cross-product-end-slide ${slide.id==='c124-mistakes'?'mistakes-end-slide':'exam-end-slide'}`}>
+    <h2>{slide.title}</h2>
+    {intro&&<p className="cross-product-end-intro">{intro}</p>}
+    <div className="cross-product-end-list">{bullets.map((entry,index)=><div key={`${index}-${entry}`}><b>{index+1}</b><HybridMathText source={entry}/></div>)}</div>
+    <div className="cross-product-end-callout"><HybridMathText source={callout}/></div>
+  </div>
+}
+
+function CrossProductSummarySlide({slide}){
+  const items=slide.presentationContent||[]
+  const formulas=items.filter(item=>item.kind==='math')
+  const bullets=items.find(item=>item.kind==='list')?.value||[]
+  const icons=['→','⊥','✋','⇄','0','▱','△','N','τ']
+  return <div data-slide-id={slide.id} className="visual-slide-canvas cross-product-summary-slide">
+    <h2>{slide.title}</h2>
+    <div className="cross-summary-formulas">
+      <article><span>Component computation</span><MathDisplay>{formulas[0]?.value}</MathDisplay></article>
+      <article><span>Magnitude and area</span><MathDisplay>{formulas[1]?.value}</MathDisplay></article>
+    </div>
+    <div className="cross-summary-concepts">{bullets.map((entry,index)=><article key={`${index}-${entry}`}><b aria-hidden="true">{icons[index]||'✓'}</b><HybridMathText source={entry}/></article>)}</div>
+  </div>
+}
+
+function CrossProductConsolidatedSlide({slide}){
+  const bullets=(slide.presentationContent||[]).find(item=>item.kind==='list')?.value||[]
+  return <div data-slide-id={slide.id} className="visual-slide-canvas cross-product-consolidated-slide">
+    <h2>{slide.title}</h2>
+    <div>{bullets.map((entry,index)=><article key={`${index}-${entry}`}><b>{index+1}</b><HybridMathText source={entry}/></article>)}</div>
+  </div>
+}
+
 export default function VisualSlideCanvas({slide,revealCount=0,editing=false,inlineEditing=false,onInlineChange,studentNotes=false,selected=[],onSelect,onChange,showGrid=false,snap=true,onElementContextMenu,onCanvasContextMenu}) {
+  const semantic=getLectureSemantic(slide.type)
   const canvasRef=useRef(null),gesture=useRef(null),[guide,setGuide]=useState(null),[overflowIds,setOverflowIds]=useState([])
   const elements=slide.elements || []
   const layoutVariant=slide.layoutVariant
@@ -68,7 +106,10 @@ export default function VisualSlideCanvas({slide,revealCount=0,editing=false,inl
     const frame=requestAnimationFrame(scan)
     return()=>{cancelAnimationFrame(frame);resizeObserver.disconnect();mutationObserver.disconnect()}
   },[editing,slide.id,slide.title,slide.elements])
-  return <div ref={canvasRef} data-slide-id={slide.id} className={`visual-slide-canvas layout-${slide.layoutMode||'slide'}${layoutVariant?` layout-variant-${layoutVariant}`:''} theme-${slide.theme||'academic'}${slide.type==='whiteboard'?` whiteboard-${slide.whiteboardBackground||'blank'}`:''}${editing?' is-editing':''}${inlineEditing?' is-inline-editing':''}${showGrid?' show-grid':''}`} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onContextMenu={(event)=>{if(!editing)return;event.preventDefault();onCanvasContextMenu?.(event,point(event))}} onClick={()=>{if(editing||inlineEditing)onSelect?.([])}}>{editing&&<div className="presentation-safe-area" aria-hidden="true"/>}{editing&&overflowIds.length>0&&<div className="internal-overflow-warning" role="status">Content overflow detected in {overflowIds.length} element{overflowIds.length===1?'':'s'}.</div>}{guide&&<i className={`smart-guide ${guide}`}/>} {visible.map((element)=>{
+  if(slide.id==='c124-mistakes'||slide.id==='c124-exam')return <CrossProductEndSlide slide={slide}/>
+  if(slide.id==='c124-summary')return <CrossProductSummarySlide slide={slide}/>
+  if(slide.id?.startsWith('chapter-12-4-consolidated-'))return <CrossProductConsolidatedSlide slide={slide}/>
+  return <div ref={canvasRef} data-slide-id={slide.id} data-semantic={semantic.kind} className={`visual-slide-canvas semantic-${semantic.kind} layout-${slide.layoutMode||'slide'}${layoutVariant?` layout-variant-${layoutVariant}`:''} theme-${slide.theme||'academic'}${slide.type==='whiteboard'?` whiteboard-${slide.whiteboardBackground||'blank'}`:''}${editing?' is-editing':''}${inlineEditing?' is-inline-editing':''}${showGrid?' show-grid':''}`} onPointerMove={move} onPointerUp={end} onPointerCancel={end} onContextMenu={(event)=>{if(!editing)return;event.preventDefault();onCanvasContextMenu?.(event,point(event))}} onClick={()=>{if(editing||inlineEditing)onSelect?.([])}}>{editing&&<div className="presentation-safe-area" aria-hidden="true"/>}{editing&&overflowIds.length>0&&<div className="internal-overflow-warning" role="status">Content overflow detected in {overflowIds.length} element{overflowIds.length===1?'':'s'}.</div>}{guide&&<i className={`smart-guide ${guide}`}/>} {visible.map((element)=>{
     const role=structuredRole(element)
     const isTitle=element.id===`${slide.id}-title`
     const autoFitTitle=isTitle&&element.titleAutoFit!==false

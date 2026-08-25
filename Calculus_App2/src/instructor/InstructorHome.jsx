@@ -2,7 +2,7 @@ import { lectureCatalog } from './data/lectureCatalog'
 import './styles/instructor.css'
 
 const calc2Chapters=[
-  {number:6,title:'Inverse Functions, Exponential and Logarithmic Functions',ids:['exponential-growth-decay','inverse-trigonometric-functions','hyperbolic-functions','limits']},
+  {number:6,title:'Inverse Functions, Exponential and Logarithmic Functions',ids:['exponential-growth-decay','inverse-trigonometric-functions','hyperbolic-functions','limits','chapter-6-exam-questions']},
   {number:12,title:'Vectors and the Geometry of Space',match:lecture=>lecture.id.startsWith('chapter-12-')},
   {number:7,title:'Integration Techniques'},
   {number:8,title:'Applications of Integrals'},

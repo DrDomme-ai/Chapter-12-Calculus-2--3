@@ -3,7 +3,9 @@ import { hyperbolicLecture, inverseTrigLecture } from './calculus2TrigLectures'
 import { geometryLecture } from './geometryLecture'
 import { applyLectureRequirements } from '../services/lectureRequirements'
 import { exponentialGrowthLecture } from './exponentialGrowthLecture'
-import { chapter121Lecture, chapter122Lecture, chapter123Lecture } from './chapter12Lectures'
+import { chapter121Lecture, chapter122Lecture, chapter123Lecture, chapter124Lecture, chapter125Lecture, chapter126Lecture } from './CALC3_LIVE_PRESENTATIONS_START_HERE'
+import { chapter6ExamLecture, chapter12ExamLecture } from './examQuestionLectures'
+import { lHospitalLecture } from './lHospitalLecture'
 
 const note = (type, title, content, math) => ({ type, title, content, math })
 
@@ -194,16 +196,18 @@ export const lectureCatalog = [
   trigonometryLecture,
   inverseTrigLecture,
   hyperbolicLecture,
-  shell('limits', 'Limits', 'Calculus II', 'Calculus I Foundations', ['Approaching behavior and one-sided limits', 'Infinite limits and limit laws', 'Epsilon-delta definition after intuition']),
+  lHospitalLecture,
+  chapter6ExamLecture,
   shell('continuity', 'Continuity', 'Calculus II', 'Calculus I Foundations', ['The three continuity conditions', 'Removable discontinuities and piecewise functions', 'Intermediate Value Theorem connections']),
   shell('derivatives', 'Derivatives', 'Calculus II', 'Calculus I Foundations', ['Secant lines approaching a tangent', 'Derivative as a limit and geometric rate', 'Derivative rules and higher derivatives']),
   shell('integrals', 'Integrals', 'Calculus II', 'Calculus I Foundations', ['Antiderivatives and +C', 'Riemann sums and signed accumulation', 'Fundamental Theorem of Calculus']),
   chapter121Lecture,
   chapter122Lecture,
   chapter123Lecture,
-  shell('chapter-12-4', '12.4 Cross Product', 'Calculus II & III', 'Chapter 12', ['Cross product and the right-hand rule', 'Area, volume, and coplanarity', 'Scalar triple product and torque']),
-  shell('chapter-12-5', '12.5 Lines and Planes', 'Calculus II & III', 'Chapter 12', ['Vector, parametric, and symmetric line equations', 'Planes and normal vectors', 'Angles and point-plane distance']),
-  shell('chapter-12-6', '12.6 Cylinders and Quadric Surfaces', 'Calculus II & III', 'Chapter 12', ['Traces and cylinders', 'Ellipsoids, paraboloids, and hyperboloids', 'Applications and interactive surfaces']),
+  chapter124Lecture,
+  chapter125Lecture,
+  chapter126Lecture,
+  chapter12ExamLecture,
   shell('chapter-13-overview', '13: Vector Functions', 'Calculus II & III', 'Chapter 13', ['Vector-valued functions and space curves', 'Derivatives, integrals, velocity, and acceleration', 'Arc length, curvature, and motion in space']),
   shell('chapter-14-overview', '14: Partial Derivatives', 'Calculus II & III', 'Chapter 14', ['Functions of several variables and level sets', 'Partial derivatives, tangent planes, and the chain rule', 'Directional derivatives, gradients, and optimization']),
   shell('chapter-15-overview', '15: Multiple Integrals', 'Calculus II & III', 'Chapter 15', ['Double and triple integrals', 'Polar, cylindrical, and spherical coordinates', 'Applications, mass, moments, and change of variables']),

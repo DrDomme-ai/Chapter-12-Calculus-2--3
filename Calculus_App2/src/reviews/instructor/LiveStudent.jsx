@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { MathDisplay, MathInline } from '../../components/MathDisplay'
 import supabase from '../../lib/supabaseClient'
 
 export default function LiveStudent({ joinCodeProp }) {
@@ -63,14 +64,14 @@ export default function LiveStudent({ joinCodeProp }) {
           <h3>Lecture: {session.lecture_id}</h3>
           <p>Waiting for instructor... (Slide {session.current_slide_index})</p>
 
-          {question && question.type === 'mcq' && (
+          {question && ['mcq','multiple-choice'].includes(question.type) && (
             <div className="live-question">
-              <h4>{question.prompt}</h4>
+              <h4>{question.mathPrompt ? <MathInline>{question.mathPrompt}</MathInline> : question.prompt}</h4>
               <ul>
                 {question.options?.map((opt, i) => (
                   <li key={i}>
                     <label>
-                      <input type="radio" name="mcq" checked={selected === i} onChange={() => setSelected(i)} /> {opt}
+                      <input type="radio" name="mcq" checked={selected === i} onChange={() => setSelected(i)} /> {question.optionMath?.[i] ? <MathDisplay>{question.optionMath[i]}</MathDisplay> : opt}
                     </label>
                   </li>
                 ))}

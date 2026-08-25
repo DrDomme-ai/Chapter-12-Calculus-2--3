@@ -1,3 +1,5 @@
+import { calculateQuizScore, normalizeQuizQuestion, rankFastestCorrect } from '../instructor/services/liveQuizService.js'
+
 // Local live-class service used by the instructor and student prototypes.
 //
 // State is kept in localStorage and announced through BroadcastChannel so
@@ -14,6 +16,7 @@ const sessions = new Map()
 const sessionSubscribers = new Map()
 const questionSubscribers = new Map()
 const responseSubscribers = new Map()
+const questionTimers = new Map()
 
 const browserAvailable = typeof window !== 'undefined'
 const transportOrigin = makeToken('tab')
@@ -227,12 +230,18 @@ function touchSession(session) {
 function studentSessionView(session,participantId){
   if(!session)return null
   const participant=session.participants.find(item=>item.id===participantId||item.external_id===participantId)
+  const reveal=session.active_question?.status==='answer-revealed',active=session.active_question?{...session.active_question,eligible_participant_ids:undefined}:null
+  if(active&&!reveal){active.correctAnswer=undefined;active.correctChoiceId=undefined;active.correct_option_index=undefined;active.solution=undefined;active.explanation=undefined}
   return {
     id:session.id,lecture_id:session.lecture_id,join_code:session.join_code,status:session.status,
+    self_paced:Boolean(session.self_paced),auto_approve:Boolean(session.auto_approve),
     current_slide_index:session.current_slide_index,question_status:session.question_status,
-    active_question:session.active_question?{...session.active_question,eligible_participant_ids:undefined}:null,
+    active_question:active,
+    public_question_leaderboard:['results','answer-revealed'].includes(session.active_question?.status)?rankFastestCorrect(session.responses.filter(response=>response.question_id===session.active_question.id),session.participants,5):[],
+    cumulative_leaderboard:session.active_question?.status==='answer-revealed'?getLeaderboard(session).slice(0,3).map(({participant,score,correct,totalTimeMs})=>({displayName:participant.display_name,score,correct,totalTimeMs})):[],
     comprehension_open:Boolean(session.comprehension_open),shared_response:session.shared_response||null,
-    participants:participant?[{...participant}]:[],responses:[],questions:[],
+    participants:participant?[{...participant}]:[],
+    own_responses:participant?session.responses.filter(response=>response.participant_id===participant.id).map(response=>({...response,participant:undefined})):[],responses:[],questions:[],
   }
 }
 
@@ -244,11 +253,13 @@ export function getProjectorSession(sessionOrId){
     id:session.id,status:session.status,question_status:session.question_status,
     participant_count:session.participants.length,shared_response:session.shared_response||null,
     active_question:session.active_question?{...session.active_question,eligible_participant_ids:undefined,eligible_participant_count:session.active_question.eligible_participant_ids?.length||session.participants.length}:null,
-    responses:(session.responses||[]).map(({question_id,answer,correct})=>({question_id,answer,correct})),
+    responses:(session.responses||[]).map(({question_id,answer,correct,points,response_time_ms})=>({question_id,answer,correct,points,response_time_ms})),
+    question_leaderboard:session.active_question?rankFastestCorrect(session.responses.filter(response=>response.question_id===session.active_question.id),session.participants,5):[],
+    leaderboard:getLeaderboard(session).map(({participant,score,correct})=>({displayName:participant.display_name,score,correct})),
   }
 }
 
-export function createSession({ lectureId = 'real-numbers', createdBy = 'instructor' } = {}) {
+export function createSession({ lectureId = 'real-numbers', createdBy = 'instructor', selfPaced = false, joinCode } = {}) {
   refreshFromStorage()
   const id = makeEntityId()
   sessionCounter += 1
@@ -256,8 +267,10 @@ export function createSession({ lectureId = 'real-numbers', createdBy = 'instruc
     id,
     lecture_id: lectureId,
     created_by: createdBy,
-    join_code: makeJoinCode(),
-    status: 'live',
+    join_code: String(joinCode||'').trim()||makeJoinCode(),
+    status: selfPaced?'self-paced':'live',
+    self_paced:Boolean(selfPaced),
+    auto_approve:Boolean(selfPaced),
     current_slide_index: 0,
     question_status: null,
     participants: [],
@@ -272,6 +285,38 @@ export function createSession({ lectureId = 'real-numbers', createdBy = 'instruc
   persistState()
   notifySession(id)
   return session
+}
+
+export function getSelfPacedSession(lectureId){
+  refreshFromStorage()
+  return [...sessions.values()].find(session=>session.lecture_id===lectureId&&session.self_paced&&session.status==='self-paced')||null
+}
+
+export function setSelfPacedMode(lectureId,enabled,{joinCode='735862'}={}){
+  refreshFromStorage()
+  const existing=getSelfPacedSession(lectureId)
+  if(enabled){
+    if(existing)return existing
+    const code=String(joinCode||'735862').trim()
+    const conflict=[...sessions.values()].find(session=>session.join_code===code&&session.status!=='ended')
+    if(conflict&&conflict.lecture_id===lectureId){
+      conflict.self_paced=true;conflict.auto_approve=true;conflict.status='self-paced';touchSession(conflict);persistState();notifySession(conflict.id);return conflict
+    }
+    return createSession({lectureId,createdBy:'instructor',selfPaced:true,joinCode:conflict?makeJoinCode():code})
+  }
+  if(existing){existing.status='ended';existing.self_paced=false;existing.auto_approve=false;touchSession(existing);persistState();notifySession(existing.id)}
+  return null
+}
+
+export function openSelfPacedQuestion(sessionId,question){
+  refreshFromStorage()
+  const session=sessions.get(sessionId)
+  if(!session?.self_paced||!question)return null
+  const normalized=normalizeQuizQuestion(question)
+  const id=String(normalized.id||question.id)
+  let stored=session.questions.find(item=>String(item.id)===id)
+  if(!stored){stored={attempts:1,immediateFeedback:false,topic:'Self-paced',...normalized,id,status:'open',opened_at:new Date().toISOString(),expires_at:null,eligible_participant_ids:session.participants.map(item=>item.id)};session.questions.push(stored);touchSession(session);persistState();notifySession(sessionId)}
+  return {...stored}
 }
 
 export function endSession(id) {
@@ -298,6 +343,8 @@ export function openQuestion(id, question) {
   refreshFromStorage()
   const session = sessions.get(id)
   if (!session) return null
+  question=normalizeQuizQuestion(question)
+  const fairTimer = Number(question.timer) || ({easy:45,medium:60,hard:90}[question.difficulty] ?? 60)
   const q = {
     attempts: 1,
     timer: null,
@@ -306,11 +353,15 @@ export function openQuestion(id, question) {
     difficulty: 'medium',
     id: makeEntityId(),
     ...question,
+    ...(question.scoring==='speed'?{timer:fairTimer}:{}),
     status: 'open',
     opened_at: new Date().toISOString(),
+    expires_at: question.scoring==='speed'?new Date(Date.now()+fairTimer*1000).toISOString():null,
     eligible_participant_ids: session.participants.map((participant) => participant.id),
   }
-  session.questions.push(q)
+  const existingIndex=session.questions.findIndex(item=>item.id===q.id)
+  if(existingIndex>=0)session.questions[existingIndex]=q
+  else session.questions.push(q)
   session.active_question = q
   session.shared_response = null
   session.question_status = 'open'
@@ -318,7 +369,22 @@ export function openQuestion(id, question) {
   persistState()
   notifyQuestion(id, { ...q })
   notifySession(id)
+  scheduleQuestionClose(id,q)
   return q
+}
+
+function scheduleQuestionClose(sessionId,question){
+  const previous=questionTimers.get(sessionId)
+  if(previous)clearTimeout(previous)
+  if(!question?.expires_at)return
+  const delay=Math.max(0,new Date(question.expires_at).getTime()-Date.now())
+  const timer=setTimeout(()=>{
+    refreshFromStorage()
+    const session=sessions.get(sessionId)
+    if(session?.active_question?.id===question.id&&session.active_question.status==='open')setQuestionStatus(sessionId,'closed')
+    questionTimers.delete(sessionId)
+  },delay)
+  questionTimers.set(sessionId,timer)
 }
 
 function setQuestionStatus(id, status) {
@@ -337,7 +403,17 @@ function setQuestionStatus(id, status) {
 export const closeQuestion = (id) => setQuestionStatus(id, 'closed')
 export const showQuestionResults = (id) => setQuestionStatus(id, 'results')
 export const revealQuestionAnswer = (id) => setQuestionStatus(id, 'answer-revealed')
-export const reopenQuestion = (id) => setQuestionStatus(id, 'open')
+export function reopenQuestion(id){
+  refreshFromStorage()
+  const session=sessions.get(id)
+  if(!session?.active_question)return null
+  const question=session.active_question
+  question.opened_at=new Date().toISOString()
+  question.expires_at=question.scoring==='speed'&&question.timer?new Date(Date.now()+Number(question.timer)*1000).toISOString():null
+  const reopened=setQuestionStatus(id,'open')
+  scheduleQuestionClose(id,reopened)
+  return reopened
+}
 
 export function submitResponse(sessionId, response) {
   refreshFromStorage()
@@ -345,6 +421,10 @@ export function submitResponse(sessionId, response) {
   if (!session) return null
   const question = session.questions.find((item) => item.id === response.question_id)
   if (!question || question.status !== 'open') return null
+  if(question.expires_at&&Date.now()>=new Date(question.expires_at).getTime()){
+    setQuestionStatus(sessionId,'closed')
+    return null
+  }
   const participantId = response.participant_id || response.participant?.id
   const attempts = session.responses.filter(
     (item) => item.question_id === response.question_id && item.participant_id === participantId,
@@ -352,15 +432,23 @@ export function submitResponse(sessionId, response) {
   if (question.attempts !== 'unlimited' && attempts >= Number(question.attempts || 1)) return null
 
   const answer = response.answer
+  const answerId=question.choiceIds?.[Number(answer)]??String(answer)
   const correct = question.graded===false?null:Array.isArray(question.correctAnswer)
     ? question.correctAnswer.every((value) => answer?.includes(value))
       && answer.length === question.correctAnswer.length
-    : String(answer) === String(question.correctAnswer ?? question.correct_option_index)
+    : question.correctChoiceId?String(answerId)===String(question.correctChoiceId):String(answer) === String(question.correctAnswer ?? question.correct_option_index)
+  const responseTimeMs = Date.now() - new Date(question.opened_at).getTime()
+  const timerMs = Math.max(1000, Number(question.timer || 60) * 1000)
+  const points = question.scoring === 'speed' && correct
+    ? calculateQuizScore({isCorrect:correct,responseTimeMs,timeLimitMs:timerMs,pointsPossible:question.pointsPossible||1000})
+    : correct ? Number(question.points || 0) : 0
   const result = {
     id: makeEntityId(),
     submitted_at: new Date().toISOString(),
-    response_time_ms: Date.now() - new Date(question.opened_at).getTime(),
+    response_time_ms: responseTimeMs,
     correct,
+    points,
+    selected_choice_id:answerId,
     ...response,
     participant_id: participantId,
   }
@@ -370,6 +458,21 @@ export function submitResponse(sessionId, response) {
   notifyResponses(sessionId, result)
   notifySession(sessionId)
   return result
+}
+
+export function getLeaderboard(sessionOrId) {
+  refreshFromStorage()
+  const session = typeof sessionOrId === 'object' ? sessionOrId : sessions.get(sessionOrId)
+  if (!session) return []
+  return session.participants.map((participant) => {
+    const responses = session.responses.filter((response) => response.participant_id === participant.id)
+    return {
+      participant,
+      score: responses.reduce((sum, response) => sum + Number(response.points || 0), 0),
+      correct: responses.filter((response) => response.correct).length,
+      totalTimeMs: responses.filter((response) => response.correct).reduce((sum, response) => sum + Number(response.response_time_ms || 0), 0),
+    }
+  }).sort((a, b) => b.score - a.score || b.correct - a.correct || a.totalTimeMs - b.totalTimeMs)
 }
 
 export function subscribeResponses(id, callback) {
@@ -431,6 +534,8 @@ export function joinByCode(joinCode, participant = {}) {
       existing.display_mode=participantProfile.display_mode||existing.display_mode||'anonymous'
       existing.display_name=publicName({...existing,...participantProfile},session.participants.indexOf(existing)+1)
       existing.name=existing.display_name
+      // Student joins are immediate. There is no instructor approval queue.
+      existing.approved = true
       existing.connected = true
       existing.last_active_at = new Date().toISOString()
       touchSession(session)
@@ -448,6 +553,8 @@ export function joinByCode(joinCode, participant = {}) {
       true_student_name:clean(participantProfile.true_student_name||participantProfile.name||'Student'),
       display_mode:participantProfile.display_mode||'anonymous',
       display_name:publicName(participantProfile,session.participants.length+1),
+      // Possession of a valid class code grants immediate access.
+      approved:true,
       connected: true,
       joined_at_question: session.questions.length + 1,
       joined_at: now,
@@ -528,9 +635,9 @@ export function getSessionReport(id,{audience='instructor'}={}){
   const session=sessions.get(id)
   if(!session)return null
   if(audience==='class'){
-    return {lectureId:session.lecture_id,status:session.status,connected:session.participants.length,questions:session.questions.map(question=>({prompt:question.prompt||question.text,category:question.category,responded:new Set(session.responses.filter(response=>response.question_id===question.id).map(response=>response.participant_id)).size,distribution:(question.options||[]).map((option,index)=>({option,count:session.responses.filter(response=>response.question_id===question.id&&Number(response.answer)===index).length}))}))}
+    return {lectureId:session.lecture_id,status:session.status,connected:session.participants.length,leaderboard:getLeaderboard(session).map(({participant,score,correct})=>({displayName:participant.display_name,score,correct})),questions:session.questions.map(question=>({prompt:question.prompt||question.text,category:question.category,responded:new Set(session.responses.filter(response=>response.question_id===question.id).map(response=>response.participant_id)).size,distribution:(question.options||[]).map((option,index)=>({option,count:session.responses.filter(response=>response.question_id===question.id&&Number(response.answer)===index).length}))}))}
   }
-  return {lectureId:session.lecture_id,status:session.status,createdAt:session.created_at,updatedAt:session.updated_at,participants:session.participants.map(participant=>{const responses=session.responses.filter(response=>response.participant_id===participant.id),comprehension=session.comprehensions.find(entry=>entry.participant_id===participant.id);return{trueStudentId:participant.true_student_id,trueStudentName:participant.true_student_name,displayMode:participant.display_mode,displayName:participant.display_name,connected:participant.connected,joinedAt:participant.joined_at,responses:responses.map(response=>{const question=session.questions.find(item=>item.id===response.question_id);return{question:question?.prompt||question?.text,category:question?.category,answer:response.answer,correct:response.correct,responseTimeMs:response.response_time_ms,submittedAt:response.submitted_at}}),comprehension:comprehension?.data||null}})}
+    return {lectureId:session.lecture_id,status:session.status,createdAt:session.created_at,updatedAt:session.updated_at,leaderboard:getLeaderboard(session).map(({participant,score,correct})=>({studentId:participant.true_student_id,studentName:participant.true_student_name,score,correct})),participants:session.participants.map(participant=>{const responses=session.responses.filter(response=>response.participant_id===participant.id),comprehension=session.comprehensions.find(entry=>entry.participant_id===participant.id);return{trueStudentId:participant.true_student_id,trueStudentName:participant.true_student_name,displayMode:participant.display_mode,displayName:participant.display_name,connected:participant.connected,joinedAt:participant.joined_at,responses:responses.map(response=>{const question=session.questions.find(item=>item.id===response.question_id);return{question:question?.prompt||question?.text,category:question?.category,answer:response.answer,correct:response.correct,points:response.points||0,responseTimeMs:response.response_time_ms,submittedAt:response.submitted_at}}),comprehension:comprehension?.data||null}})}
 }
 
 export function subscribeQuestions(id, callback) {
@@ -615,6 +722,9 @@ function notifyQuestion(id, question) {
 
 export default {
   createSession,
+  getSelfPacedSession,
+  setSelfPacedMode,
+  openSelfPacedQuestion,
   endSession,
   changeSlide,
   openQuestion,
@@ -635,6 +745,7 @@ export default {
   getSessionReport,
   subscribeQuestions,
   submitResponse,
+  getLeaderboard,
   subscribeResponses,
   openComprehension,
   submitComprehension,

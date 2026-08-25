@@ -5,7 +5,8 @@ import PresenterNotesPanel from './PresenterNotesPanel'
 
 const clock=(seconds)=>`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`
 
-export default function PresenterDashboardWindow({popup,host,lectureTitle,current,next,index,total,revealCount,onPrevious,onNext,onClose,onInstructorFeedbackChange}){
+export default function PresenterDashboardWindow({popup,host,lectureTitle,current,next,nextSlide,index,total,revealCount,onPrevious,onNext,onClose,onInstructorFeedbackChange}){
+  next=next??nextSlide
   const [seconds,setSeconds]=useState(0)
   useEffect(()=>{if(!popup)return;popup.addEventListener('beforeunload',onClose);return()=>popup.removeEventListener('beforeunload',onClose)},[onClose,popup])
   useEffect(()=>{const timer=setInterval(()=>setSeconds(value=>value+1),1000);return()=>clearInterval(timer)},[])

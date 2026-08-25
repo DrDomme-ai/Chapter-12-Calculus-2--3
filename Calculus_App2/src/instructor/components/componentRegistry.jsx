@@ -15,6 +15,10 @@ import TrigFunctionLookupExplorer from './TrigFunctionLookupExplorer'
 import InverseTrigBenchmarkExplorer from './InverseTrigBenchmarkExplorer'
 import SixTrigInverseMaster from './SixTrigInverseMaster'
 import Chapter12Explorers from './Chapter12Explorers'
+import CrossProductExplorer from './CrossProductExplorer'
+import LHospitalVisuals from './LHospitalVisuals'
+import HyperbolicStoryVisuals from './HyperbolicStoryVisuals'
+import InverseTrigChainRuleLayers from './InverseTrigChainRuleLayers'
 import '../styles/chapter12.css'
 
 export function RegisteredComponent({componentKey,revealCount=0,settings={}}) {
@@ -28,6 +32,7 @@ export function RegisteredComponent({componentKey,revealCount=0,settings={}}) {
   if(componentKey==='trigFunctionLookupExplorer') return <TrigFunctionLookupExplorer {...settings}/>
   if(componentKey==='inverseTrigBenchmarkExplorer') return <InverseTrigBenchmarkExplorer {...settings}/>
   if(componentKey==='sixTrigInverseMaster') return <SixTrigInverseMaster {...settings}/>
+  if(componentKey==='inverseTrigChainRuleLayers') return <InverseTrigChainRuleLayers revealCount={revealCount}/>
   if(componentKey==='hyperbolicExplorer') return <HyperbolicExplorer {...settings}/>
   if(componentKey==='studentFeedback') return <StudentFeedbackPrompt moduleId={settings.moduleId} moduleTitle={settings.moduleTitle} compact/>
   if(componentKey==='fieldTester'||componentKey==='field:tester') return <FieldExplorer stage="tester" revealCount={revealCount}/>
@@ -38,6 +43,13 @@ export function RegisteredComponent({componentKey,revealCount=0,settings={}}) {
   if(componentKey?.startsWith('lecture-hook:'))return <LectureHooks stage={componentKey.split(':')[1]}/>
   if(componentKey?.startsWith('geometry:'))return <GeometryExplorers stage={componentKey.split(':')[1]} revealCount={revealCount} {...settings}/>
   if(componentKey?.startsWith('growth-decay:'))return <GrowthDecayVisuals stage={componentKey.split(':')[1]} settings={settings}/>
-  if(componentKey?.startsWith('chapter12:'))return <Chapter12Explorers stage={componentKey.split(':')[1]} revealCount={revealCount}/>
+  if(componentKey?.startsWith('chapter12:')){
+    const requestedStage=componentKey.split(':')[1]
+    if(requestedStage==='cross-product-geometry')return <CrossProductExplorer/>
+    const stage=requestedStage
+    return <Chapter12Explorers stage={stage} revealCount={revealCount}/>
+  }
+  if(componentKey?.startsWith('lhospital:'))return <LHospitalVisuals stage={componentKey.split(':')[1]} revealCount={revealCount}/>
+  if(componentKey?.startsWith('hyperbolic-story:'))return <HyperbolicStoryVisuals stage={componentKey.split(':')[1]}/>
   return <div className="editor-placeholder"><strong>{componentKey||'Custom component'}</strong><span>Registered lecture component</span></div>
 }

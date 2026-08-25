@@ -31,7 +31,9 @@ function RenderFormula({formula,display=false}){
 export default function HybridMathText({source,defaultMath=false}){
   const value=String(source??'')
   const matches=[...value.matchAll(mathPattern)]
-  if(defaultMath&&!matches.length){const rows=value.split(/\r?\n/).map(row=>row.trim()).filter(Boolean);return rows.length>1?<div className="discrete-solution-math">{rows.map((row,index)=><RenderFormula formula={row} display key={index}/>)}</div>:<RenderFormula formula={value} display/>}
+  // Source formatting newlines inside math(...) are whitespace, not separate equations.
+  // Keep environments, matrices, determinants, and other multiline LaTeX intact.
+  if(defaultMath&&!matches.length)return <RenderFormula formula={value} display/>
   const parts=[];let cursor=0
   matches.forEach((match,index)=>{
     if(match.index>cursor)parts.push(<MarkdownText source={value.slice(cursor,match.index)} key={`text-${index}`}/>)

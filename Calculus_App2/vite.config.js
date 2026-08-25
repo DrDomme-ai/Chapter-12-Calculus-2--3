@@ -34,5 +34,14 @@ function speechApi(apiKey) {
 // The API key is read only by the Vite server and is never embedded in client code.
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  return { plugins: [react(), speechApi(env.OPENAI_API_KEY)] }
+  return {
+    plugins: [react(), speechApi(env.OPENAI_API_KEY)],
+    server: {
+      watch: {
+        // Local browser test profiles contain locked database files on Windows.
+        // They are not application source and must not be watched by Vite.
+        ignored: ['**/.tmp/**'],
+      },
+    },
+  }
 })

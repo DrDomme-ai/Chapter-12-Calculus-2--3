@@ -1,10 +1,10 @@
 const sections = [
   ['12.1', 'Three-Dimensional Coordinate Systems', true],
-  ['12.2', 'Vectors', false],
-  ['12.3', 'The Dot Product', false],
-  ['12.4', 'The Cross Product', false],
-  ['12.5', 'Equations of Lines and Planes', false],
-  ['12.6', 'Cylinders and Quadric Surfaces', false],
+  ['12.2', 'Vectors', true],
+  ['12.3', 'The Dot Product', true],
+  ['12.4', 'The Cross Product', true],
+  ['12.5', 'Equations of Lines and Planes', true],
+  ['12.6', 'Cylinders and Quadric Surfaces', true],
 ]
 
 function ChapterMenu({
@@ -29,7 +29,7 @@ function ChapterMenu({
         <button className="primary-button" type="button" onClick={onOpenReview}>
           {reviewLabel}
         </button>
-        <p className="demo-note">This review lab helps students prepare for Multivariable Calculus using interactive questions and step-by-step explanations.</p>
+        <p className="demo-note">Six long, self-paced sections preserve definitions, interactives, formula reconstruction, worked solutions, concept traps, and exam practice.</p>
       </div>
       <div className="chapter-demo-card">
         <button className="primary-button" type="button" onClick={onOpenJsonDemo}>
@@ -39,7 +39,7 @@ function ChapterMenu({
       </div>
       <section className="chapter-list" aria-label="Chapter 12 sections">
         {sections.map(([number, title, available]) => (
-          <button key={number} type="button" className={`section-card${available ? ' available' : ''}`} onClick={available ? onOpenLecture : undefined} disabled={!available}>
+          <button key={number} type="button" className={`section-card${available ? ' available' : ''}`} onClick={number==='12.1'?onOpenLecture:onOpenReview} disabled={!available}>
             <span className="section-number">{number}</span>
             <span className="section-title">{title}</span>
             <span className={`status ${available ? 'ready' : ''}`}>{available ? 'Begin lecture →' : 'Coming Soon'}</span>

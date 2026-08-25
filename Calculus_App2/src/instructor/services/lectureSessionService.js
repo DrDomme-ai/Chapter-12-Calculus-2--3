@@ -3,6 +3,9 @@ import liveService from '../../lib/mockLive'
 // UI code talks only to this boundary. A realtime backend can replace this
 // adapter without changing presenter, audience, or student components.
 export const createLectureSession = (lectureId) => liveService.createSession({ lectureId })
+export const getSelfPacedLectureSession = (lectureId) => liveService.getSelfPacedSession(lectureId)
+export const setLectureSelfPacedMode = (lectureId, enabled, options) => liveService.setSelfPacedMode(lectureId,enabled,options)
+export const openSelfPacedLectureQuestion = (sessionId, question) => liveService.openSelfPacedQuestion(sessionId,question)
 export const endLectureSession = (sessionId) => liveService.endSession(sessionId)
 export const joinLectureSession = (code, participant) => liveService.joinByCode(code, participant)
 export const joinStudentLectureSession = (code, participant) => liveService.joinStudentByCode(code, participant)
@@ -30,3 +33,4 @@ export const getComprehensionResults = (session) => session?.comprehensions || [
 export const getNonResponders = (session) => session ? liveService.getNonResponders(session.id,session.active_question?.id) : []
 export const getParticipationStats = (session) => session ? liveService.getParticipationStats(session.id) : []
 export const getTopicAccuracy = (session) => session ? liveService.getTopicAccuracy(session.id) : []
+export const getLeaderboard = (session) => session ? liveService.getLeaderboard(session) : []

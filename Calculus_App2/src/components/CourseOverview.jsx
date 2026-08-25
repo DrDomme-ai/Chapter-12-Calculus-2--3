@@ -47,6 +47,7 @@ export default function CourseOverview({
   onHome,
   onOpenReview,
   onOpenChapter,
+  onOpenChapter6,
   onOpenProject,
 }) {
   const course = getCourseProfile(courseId)
@@ -113,6 +114,7 @@ export default function CourseOverview({
                   <summary><span>{chapter.chapterLabel}</span><strong>{chapter.title}</strong></summary>
                   <div className="course-overview__chapter-contents">
                     {chapter.subchapters?.length?<ul>{chapter.subchapters.map((subchapter)=><li key={subchapter}>{subchapter}</li>)}</ul>:<p>Lectures will appear here as chapter materials are added.</p>}
+                    {chapter.chapterLabel==='CHAPTER 6'&&<button type="button" onClick={onOpenChapter6}>Open complete Chapter 6 library</button>}
                     {chapter.chapterLabel==='CHAPTER 12'&&<button type="button" onClick={onOpenChapter}>Open Chapter 12</button>}
                     {!isAvailable&&<small>Planned</small>}
                   </div>
