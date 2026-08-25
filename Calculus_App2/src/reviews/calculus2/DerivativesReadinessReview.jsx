@@ -1,5 +1,5 @@
 import ReviewRunner from '../../components/review/ReviewRunner'
-import { derivativeReviewQuestions, derivativeReviewStations } from '../../data/derivativesReadiness'
+import { derivativeReviewQuestions, derivativeReviewStations } from '../../data/courseReviews/calculus1'
 
 export default function DerivativesReadinessReview({
   completed,

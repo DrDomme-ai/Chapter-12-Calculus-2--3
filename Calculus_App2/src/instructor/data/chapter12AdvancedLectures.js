@@ -1,0 +1,55 @@
+const note=(type,title,content,math)=>({type,title,content,...(math?{math}:{})})
+const item=(kind,value)=>({kind,value})
+const slide=(id,type,title,content=[],options={})=>({id,type,title,presentationContent:content,presenterNotes:options.presenterNotes||[note('timing','Time budget',options.minutes?`${options.minutes} minutes`:'3–5 minutes')],studentNotes:options.studentNotes||[],revealSteps:options.revealSteps||[],layoutMode:'slide',theme:'classic-math',level:'essential',courses:['calc2','calc3'],recommendedFor:['calc2','calc3'],visualization:options.visualization,question:options.question,minutes:options.minutes||4})
+const viz=(id,title,stage,content,minutes=6)=>slide(id,'visualization',title,content,{visualization:`chapter12:${stage}`,minutes,presenterNotes:[note('action','Instructor controls','Use Play, Pause, Step, and Reset. Pause before each mathematical reveal.'),note('timing','Time budget',`${minutes} minutes`)]})
+const question=(id,title,prompt,options,correctAnswer,minutes=4)=>slide(id,'live-question',title,[item('callout','Predict privately, then defend your reasoning.')],{minutes,question:{type:'multiple-choice',prompt,options,correctAnswer},presenterNotes:[note('answer','Debrief',`Correct answer: ${options[correctAnswer]}`),note('timing','Time budget',`${minutes} minutes including discussion.`)]})
+
+export const chapter124Lecture={id:'chapter-12-4',title:'12.4 Cross Product',course:'Calculus II & III',chapter:'Chapter 12',section:'12.4',status:'ready',description:'A curated 80-minute geometric story about perpendicular direction, orientation, area, volume, and torque.',objectives:['Compute and interpret cross products','Use right-hand orientation','Connect magnitude to area','Use triple products and torque'],slides:[
+ slide('c124-open','title','How can two directions create a third?', [item('eyebrow','12.4 · Cross Product'),item('callout','The dot product returned a number. Today two vectors produce a perpendicular vector.')],{minutes:4,presenterNotes:[note('opening','Curiosity','Hold two pencils in different directions. Ask students to point in a direction perpendicular to both.'),note('timing','Time','4 minutes')]}),
+ viz('c124-perpendicular','A perpendicular vector appears','cross-product',[item('math',String.raw`\mathbf a\times\mathbf b\perp\mathbf a,\mathbf b`)],7),
+ question('c124-output','Output check','What kind of object is a×b?',['Scalar','Vector','Plane','Angle'],1,4),
+ slide('c124-components','definition','Component computation',[item('math',String.raw`\mathbf a\times\mathbf b=\begin{array}{|ccc|}\mathbf i&\mathbf j&\mathbf k\\a_1&a_2&a_3\\b_1&b_2&b_3\end{array}`),item('callout','The middle cofactor carries a minus sign.')],{minutes:7,presenterNotes:[note('derivation','Professor derivation','Expand along the first row, then verify the result dots to zero with both inputs.'),note('timing','Time','7 minutes')]}),
+ slide('c124-example','worked-example','Compute and verify',[item('math',String.raw`\langle1,2,3\rangle\times\langle2,-1,4\rangle=\langle11,2,-5\rangle`),item('math',String.raw`\langle11,2,-5\rangle\cdot\langle1,2,3\rangle=0`)],{minutes:8,revealSteps:['Set up determinant','Expand components','Check perpendicularity']}),
+ viz('c124-hand','Order controls direction','right-hand',[item('math',String.raw`\mathbf b\times\mathbf a=-(\mathbf a\times\mathbf b)`)],7),
+ question('c124-order','Reverse the order','If a×b=<1,2,3>, what is b×a?',['<1,2,3>','<-1,-2,-3>','0','Cannot know'],1,4),
+ viz('c124-area','Sine becomes area','cross-area',[item('math',String.raw`\|\mathbf a\times\mathbf b\|=\|\mathbf a\|\|\mathbf b\|\sin\theta`)],7),
+ slide('c124-area-example','worked-example','Triangle area from two sides',[item('math',String.raw`A=(0,0,0),\ B=(2,0,1),\ C=(0,3,1)`),item('math',String.raw`\text{Area}=\tfrac12\|\overrightarrow{AB}\times\overrightarrow{AC}\|=\tfrac12\sqrt{46}`)],{minutes:8}),
+ slide('c124-triple','theorem','Scalar triple product measures volume',[item('math',String.raw`V=|\mathbf a\cdot(\mathbf b\times\mathbf c)|`),item('callout','Volume zero is the coplanarity test.')],{minutes:7,presenterNotes:[note('derivation','Why','Cross product gives base area and its unit normal; the dot product supplies signed height.'),note('timing','Time','7 minutes')]}),
+ viz('c124-torque','Torque: perpendicular force turns best','torque',[item('math',String.raw`\boldsymbol\tau=\mathbf r\times\mathbf F`)],6),
+ slide('c124-smile','connection','A mathematical smile',[item('text','Cross products are very particular about order—they always insist on being right-handed.'),item('callout','Application: longer wrench handles increase |r| and therefore torque.')],{minutes:3}),
+ question('c124-exit','Exit Check','Why is the cross product zero for parallel nonzero vectors?',['Their dot product is zero','sin θ=0','cos θ=0','Their lengths are zero'],1,4),
+]}
+
+export const chapter125Lecture={id:'chapter-12-5',title:'12.5 Lines and Planes',course:'Calculus II & III',chapter:'Chapter 12',section:'12.5',status:'ready',description:'A curated 80-minute journey built around point + direction and point + normal.',objectives:['Parameterize lines','Build plane equations','Find geometric angles','Compute point-plane distance'],slides:[
+ slide('c125-open','title','What information pins down a line or a plane?', [item('eyebrow','12.5 · Lines and Planes'),item('callout','Line = point + direction. Plane = point + normal.')],{minutes:5,presenterNotes:[note('opening','Curiosity','Ask why one point is not enough to determine either object.'),note('timing','Time','5 minutes')]}),
+ viz('c125-line','A point travels along a line','line-motion',[item('math',String.raw`\mathbf r(t)=\mathbf r_0+t\mathbf v`)],8),
+ slide('c125-parametric','derivation','Read the vector equation componentwise',[item('math',String.raw`x=x_0+at,\quad y=y_0+bt,\quad z=z_0+ct`),item('callout','If a direction component is zero, that coordinate stays constant.')],{minutes:6}),
+ question('c125-t','Parameter meaning','At t=0, where is r(t)=r₀+tv?',['At the origin','At r₀','At v','Undefined'],1,4),
+ slide('c125-line-example','worked-example','Line through two points',[item('math',String.raw`P=(1,0,-2),\ Q=(3,4,1)`),item('math',String.raw`\mathbf r=\langle1,0,-2\rangle+t\langle2,4,3\rangle`)],{minutes:7}),
+ slide('c125-symmetric','connection','Eliminate the parameter carefully',[item('math',String.raw`\frac{x-x_0}{a}=\frac{y-y_0}{b}=\frac{z-z_0}{c}`),item('callout','Never divide by a zero direction component; keep that coordinate constant instead.')],{minutes:5}),
+ viz('c125-plane','A normal defines a plane','plane-normal',[item('math',String.raw`\mathbf n\cdot(\mathbf r-\mathbf r_0)=0`)],8),
+ slide('c125-plane-example','worked-example','Point-normal to scalar form',[item('math',String.raw`P=(2,-1,3),\ \mathbf n=\langle1,4,-2\rangle`),item('math',String.raw`(x-2)+4(y+1)-2(z-3)=0\Rightarrow x+4y-2z+8=0`)],{minutes:8}),
+ question('c125-linear','Concept trap','One linear equation in x,y,z usually represents what?',['A point','A line','A plane','A sphere'],2,4),
+ viz('c125-angle','Plane angles come from normals','plane-angle',[item('math',String.raw`\cos\theta=\frac{|\mathbf n_1\cdot\mathbf n_2|}{\|\mathbf n_1\|\|\mathbf n_2\|}`)],6),
+ viz('c125-distance','Distance is a normal projection','point-plane-distance',[item('math',String.raw`D=\frac{|ax_0+by_0+cz_0+d|}{\sqrt{a^2+b^2+c^2}}`)],7),
+ slide('c125-smile','connection','A mathematical smile',[item('text','A line has direction; a plane has standards—specifically, a normal standard.'),item('callout','Air traffic paths and computer graphics use these same point-direction and point-normal structures.')],{minutes:3}),
+ question('c125-exit','Exit Check','Which information determines a plane?',['One point only','One direction only','A point and a normal','Two unrelated points'],2,4),
+]}
+
+export const chapter126Lecture={id:'chapter-12-6',title:'12.6 Cylinders and Quadric Surfaces',course:'Calculus II & III',chapter:'Chapter 12',section:'12.6',status:'ready',description:'A visual, curated 80-minute investigation of missing variables, traces, and quadric morphology.',objectives:['Recognize cylinders','Use traces as evidence','Classify standard quadrics','Connect surfaces to applications'],slides:[
+ slide('c126-open','title','What does an equation hide when a variable disappears?', [item('eyebrow','12.6 · Cylinders and Quadric Surfaces'),item('callout','A missing variable is not zero—it is free.')],{minutes:5,presenterNotes:[note('opening','Spark','Show y=x² and ask what changes when the same equation lives in space.'),note('timing','Time','5 minutes')]}),
+ viz('c126-extrude','From parabola to parabolic cylinder','missing-variable',[item('math',String.raw`y=x^2\quad(z\text{ is free})`)],8),
+ question('c126-circle','Dimension trap','In R³, what is x²+y²=64?',['A circle','A sphere','A circular cylinder','A disk'],2,4),
+ slide('c126-cylinder-types','definition','The missing axis gives the ruling direction',[item('list',['y=x²: parabolic cylinder parallel to z','x²+y²=64: circular cylinder parallel to z','x²-y²=1: hyperbolic cylinder parallel to z'])],{minutes:6}),
+ viz('c126-traces','Slice a surface to reveal its traces','trace-explorer',[item('math',String.raw`x=k,\quad y=k,\quad z=k`)],9),
+ slide('c126-trace-example','worked-example','Read a saddle from traces',[item('math',String.raw`z=x^2-y^2`),item('list',['y=0 gives z=x²','x=0 gives z=-y²','z=k gives hyperbolas (or crossing lines at k=0)'])],{minutes:8}),
+ viz('c126-gallery','Quadric morphology gallery','quadric-gallery',[item('list',['Ellipsoid','Cone','Elliptic paraboloid','Hyperbolic paraboloid','One-sheet hyperboloid','Two-sheet hyperboloid'])],9),
+ question('c126-sign','Sign-pattern check','Which surface has one squared term with the opposite sign and equals 1?',['Ellipsoid','Cone','One-sheet hyperboloid','Elliptic paraboloid'],2,4),
+ viz('c126-slices','Reconstruct a surface from slices','surface-slices',[item('callout','Move the slicing plane; compare its highlighted intersection with the 2D trace.')],7),
+ slide('c126-classify','worked-example','Normalize before classifying',[item('math',String.raw`4x^2+9y^2-z^2=36`),item('math',String.raw`\frac{x^2}{9}+\frac{y^2}{4}-\frac{z^2}{36}=1`),item('callout','Hyperboloid of one sheet, axis along z.')],{minutes:7}),
+ slide('c126-facts','connection','Geometry built into the world',[item('list',['Earth is closer to an ellipsoid than a sphere.','Paraboloids focus signals in dishes and telescopes.','Hyperboloid forms appear in cooling towers and structures.'])],{minutes:4}),
+ slide('c126-smile','connection','A mathematical smile',[item('text','A missing variable is not absent-minded—it is extending its options in another dimension.')],{minutes:2}),
+ question('c126-exit','Exit Check','If z is missing from a surface equation, what should you inspect first?',['Set z=0 permanently','Extension parallel to z','A sphere centered on z','No real points'],1,4),
+]}
+// CALCULUS III LIVE PRESENTATIONS: 12.4, 12.5, AND 12.6
+// Edit the `slides` array inside chapter124Lecture, chapter125Lecture, or chapter126Lecture.

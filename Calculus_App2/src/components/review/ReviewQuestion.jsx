@@ -5,6 +5,7 @@ import { LimitQuestionVisual } from './LimitVisuals'
 import { DerivativeQuestionVisual } from './DerivativeVisuals'
 import { ExpLogQuestionVisual } from './ExpLogVisuals'
 import { matchesAlgebraicAnswer } from './algebraicEquivalence'
+import DetailedSolutionPanel from './DetailedSolutionPanel'
 
 const resolveLearnFirst = (question, station) => {
   const stationContent = station?.learnFirst || {}
@@ -309,6 +310,7 @@ export default function ReviewQuestion({ question, station, number, total, alrea
   const [feedback, setFeedback] = useState(alreadyComplete ? { correct: true, previous: true } : null)
   const [visibleHintCount, setVisibleHintCount] = useState(0)
   const [showSolution, setShowSolution] = useState(false)
+  const [shownSolutionParts, setShownSolutionParts] = useState(1)
   const [stage, setStage] = useState(() => (hasLearnFirst ? 'learn' : 'exercise'))
   const [showConceptReview, setShowConceptReview] = useState(false)
   const exerciseHeadingRef = useRef(null)
@@ -453,13 +455,24 @@ export default function ReviewQuestion({ question, station, number, total, alrea
       )}
 
       {showSolution && (
-        <div className="review-solution" role="region" aria-label="Worked solution">
-          <span className="card-label">Worked solution</span>
-          <p>{question.explanation}</p>
-          {question.explanationMath && <MathDisplay>{question.explanationMath}</MathDisplay>}
-        </div>
+        <DetailedSolutionPanel
+          solution={question.solution || {
+            goal: question.solutionGoal,
+            recognition: question.methodClue,
+            formula: question.formula,
+            steps: question.solutionSteps || [question.explanation, question.explanationMath].filter(Boolean),
+            why: question.whyItWorks,
+            finalAnswer: question.finalAnswer,
+            quickCheck: question.quickCheck,
+            commonMistake: question.commonMistake,
+            takeaway: question.takeaway,
+          }}
+          visibleParts={shownSolutionParts}
+          onShowPart={() => setShownSolutionParts((count) => count + 1)}
+          onShowAll={() => setShownSolutionParts((question.solutionSteps || [question.explanation, question.explanationMath].filter(Boolean)).length)}
+          onHide={() => { setShowSolution(false); setShownSolutionParts(1) }}
+        />
       )}
     </article>
   )
 }
-

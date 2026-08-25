@@ -1,5 +1,5 @@
 import ReviewRunner from '../../components/review/ReviewRunner'
-import { limitReviewQuestions, limitReviewStations } from '../../data/limitsReadiness'
+import { limitReviewQuestions, limitReviewStations } from '../../data/courseReviews/calculus1'
 
 export default function LimitsReadinessReview({
   completed,

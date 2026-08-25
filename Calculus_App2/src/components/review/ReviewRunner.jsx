@@ -24,14 +24,15 @@ export default function ReviewRunner({
   const [currentIndex, setCurrentIndex] = useState(0)
   const [showSummary, setShowSummary] = useState(false)
   const currentQuestion = questions[currentIndex]
-  const currentStation = stations.find((station) => station.id === currentQuestion.stationId)
+  const currentStation = stations.find((station) => station.id === currentQuestion?.stationId)
   const completeCount = Object.values(completed).filter(Boolean).length
   const completionPercent = Math.round((completeCount / questions.length) * 100)
 
   const stationProgress = useMemo(
     () => Object.fromEntries(stations.map((station) => {
-      const correct = station.questions.filter((question) => completed[question.id]).length
-      return [station.id, { correct, total: station.questions.length }]
+      const stationQuestions = station.questions || []
+      const correct = stationQuestions.filter((question) => completed[question.id]).length
+      return [station.id, { correct, total: stationQuestions.length }]
     })),
     [completed, stations],
   )
@@ -107,7 +108,7 @@ export default function ReviewRunner({
           <nav aria-label={topicLabel}>
             {stations.map((station) => {
               const progress = stationProgress[station.id]
-              const active = !showSummary && currentQuestion.stationId === station.id
+              const active = !showSummary && currentQuestion?.stationId === station.id
               return (
                 <button
                   type="button"

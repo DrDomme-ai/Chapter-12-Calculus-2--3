@@ -1,7 +1,4 @@
-import React from 'react'
 import LectureCard from '../../components/LectureCard'
-
-const showDevControls = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV
 
 const lectures = [
   {
@@ -12,7 +9,7 @@ const lectures = [
     status: 'ready',
     routeOpen: '#/instructor/real-numbers',
     routeStartLive: '#/instructor/mock/live',
-    routeJoin: '#/instructor/mock/join',
+    routeJoin: '#/student',
   },
   {
     id: 'trigonometry',
@@ -23,7 +20,7 @@ const lectures = [
   },
 ]
 
-export default function InstructorHome({ onHome, onOpenLecture }) {
+export default function InstructorHome({ onHome }) {
   return (
     <div className="page instructor-home-page">
       <button className="text-button" type="button" onClick={onHome}>

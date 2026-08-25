@@ -7,6 +7,7 @@ import FundamentalReviewPage from './components/review/FundamentalReviewPage'
 import StudentProjectSystem from './project/StudentProjectSystem'
 import usePersistentState from './hooks/usePersistentState'
 import StudentFeedbackPrompt from './components/feedback/StudentFeedbackPrompt'
+import { continuityReview, derivativesReview, derivativeApplicationsReview, integralFoundationsReview } from './data/courseReviews/calculus1'
 import './App.css'
 
 const Lecture1201 = lazy(() => import('./lectures/chapter12/Lecture1201'))
@@ -19,8 +20,11 @@ const CofunctionLesson = lazy(() => import('./reviews/fundamental/CofunctionLess
 const AdvancedTrigLesson = lazy(() => import('./reviews/fundamental/AdvancedTrigLesson'))
 const TrigReadinessReview = lazy(() => import('./reviews/calculus2/TrigReadinessReview'))
 const LimitsReadinessReview = lazy(() => import('./reviews/calculus2/LimitsReadinessReview'))
-const DerivativesReadinessReview = lazy(() => import('./reviews/calculus2/DerivativesReadinessReview'))
 const ExpLogReadinessReview = lazy(() => import('./reviews/calculus2/ExpLogReadinessReview'))
+const Calculus1EditableReview = lazy(() => import('./reviews/fundamental/Calculus1EditableReview'))
+const HyperbolicStudyLecture = lazy(() => import('./reviews/calculus2/HyperbolicStudyLecture'))
+const Chapter6LearningLibrary = lazy(() => import('./reviews/calculus2/Chapter6LearningLibrary'))
+const Chapter12Review = lazy(() => import('./reviews/calc3/Chapter12Review'))
 const AlgebraReview = lazy(() => import('./reviews/fundamental/AlgebraReview'))
 const InstructorHome = lazy(() => import('./instructor/InstructorHome'))
 const LectureStudio = lazy(() => import('./instructor/LectureStudio'))
@@ -94,10 +98,13 @@ const sharedReviewPaths = {
   'trig-advanced-angle-identities':'trigonometry/angle-identities',
   'trig-advanced-combined-sinusoid':'trigonometry/combined-sinusoid',
   'trig-advanced-inverse-trig':'trigonometry/inverse-trig',
-  'trig-advanced-hyperbolic':'trigonometry/hyperbolic',
+  'hyperbolic-study':'trigonometry/hyperbolic',
   'trig-readiness-practice': 'trigonometry/practice',
   'calc2-limits': 'calculus-i/limits',
+  'calc2-continuity': 'calculus-i/continuity',
   'calc2-derivatives': 'calculus-i/derivatives',
+  'calc2-derivative-applications': 'calculus-i/applications-of-derivatives',
+  'calc2-integrals': 'calculus-i/integral-foundations',
   'calc2-exp-log': 'calculus-i/exp-log-inverse-trig',
 }
 
@@ -127,8 +134,10 @@ function getCombinedTrigProgress(progress) {
 }
 
 function getRouteHash(view, courseId) {
+  if (view.startsWith('chapter-12-review-')) return `#/${courseId || 'calc3'}/chapter-12/review/${view.replace('chapter-12-review-','')}`
   if (sharedReviewPaths[view]) return `#/review/${sharedReviewPaths[view]}`
   if (view === 'course-home') return `#/${courseId || 'calc2'}`
+  if (view === 'chapter-6-library') return '#/calc2/chapter-6'
   if (view === 'chapter' || view.startsWith('lecture-')) {
     return `#/${courseId || 'calc2'}${routeByView[view]}`
   }
@@ -138,7 +147,9 @@ function getRouteHash(view, courseId) {
 }
 
 function parseRouteHash(hash) {
-  const path = hash.replace(/^#/, '') || '/'
+  const rawPath = hash.replace(/^#/, '') || '/'
+  const [path,queryString=''] = rawPath.split('?')
+  const query=new URLSearchParams(queryString)
   const sharedEntry = Object.entries(sharedReviewPaths).find(([, slug]) => path === `/review/${slug}`)
   const courseMatch = path.match(/^\/(calc2|calc3)(?:\/|$)/)
   const parsedCourseId = courseMatch?.[1] || null
@@ -154,16 +165,21 @@ function parseRouteHash(hash) {
   if (path.startsWith('/instructor/join')) return { view: 'instructor-join', courseId: null }
   if (path === '/instructor/mock/live') return { view: 'instructor-mock-live', courseId: null }
   if (path === '/instructor/mock/join') return { view: 'instructor-mock-join', courseId: null }
+  if (path === '/student') return { view: 'instructor-mock-join', courseId: null, joinCode: query.get('code')||'' }
   const instructorLectureMatch = path.match(/^\/instructor\/lectures\/([^/]+)\/(edit|presenter|live)$/)
   if (instructorLectureMatch) return { view: 'instructor-lecture', courseId: null, lectureId: decodeURIComponent(instructorLectureMatch[1]), lectureMode: instructorLectureMatch[2] }
-  // support join links like /join/<code> or /instructor/mock/join/<code>
+  // Legacy student links remain readable, but all newly shared links use the
+  // canonical public /student route above.
   const joinMatch = path.match(/^\/join\/(.+)$/)
   const mockJoinMatch = path.match(/^\/instructor\/mock\/join\/(.+)$/)
   if (joinMatch) return { view: 'instructor-mock-join', courseId: null, joinCode: decodeURIComponent(joinMatch[1]) }
   if (mockJoinMatch) return { view: 'instructor-mock-join', courseId: null, joinCode: decodeURIComponent(mockJoinMatch[1]) }
   if (/^\/(calc2|calc3)\/chapter-12\/12-1$/.test(path)) return { view: 'lecture-12-1', courseId: parsedCourseId }
   if (/^\/(calc2|calc3)\/chapter-12\/data-demo$/.test(path)) return { view: 'lecture-json', courseId: parsedCourseId }
+  const chapter12ReviewMatch=path.match(/^\/(calc2|calc3)\/chapter-12\/review\/(12-[1-6])$/)
+  if(chapter12ReviewMatch)return {view:`chapter-12-review-${chapter12ReviewMatch[2]}`,courseId:parsedCourseId}
   if (/^\/(calc2|calc3)\/chapter-12$/.test(path)) return { view: 'chapter', courseId: parsedCourseId }
+  if (path === '/calc2/chapter-6') return { view: 'chapter-6-library', courseId: 'calc2' }
   if (path === '/calc2' || path === '/calc3') return { view: 'course-home', courseId: parsedCourseId }
   if (path === '/review') return { view: 'review-path', courseId: null }
   if (path === '/project') return { view: 'project', courseId: null }
@@ -204,7 +220,8 @@ function App() {
     return () => window.removeEventListener('popstate', syncFromHistory)
   }, [])
 
-  const navigate = (nextView, nextCourseId = courseId) => {
+  const navigate = (requestedView, nextCourseId = courseId) => {
+    const nextView=requestedView==='trig-advanced-hyperbolic'?'hyperbolic-study':requestedView
     const nextHash = getRouteHash(nextView, nextCourseId)
     if (window.location.hash !== nextHash) window.history.pushState(null, '', nextHash)
     setCourseId(nextCourseId)
@@ -256,10 +273,12 @@ function App() {
           onHome={() => navigate('home', null)}
           onOpenReview={() => navigate('review-path', null)}
           onOpenChapter={() => navigate('chapter', courseId || 'calc2')}
+          onOpenChapter6={() => navigate('chapter-6-library','calc2')}
           onOpenProject={() => navigate('project', null)}
         />
       )}
       {view === 'project' && <StudentProjectSystem onHome={() => navigate('home', null)} />}
+      {view==='chapter-6-library'&&<Suspense fallback={<div className="lecture-loading" role="status">Preparing the complete Chapter 6 learning library…</div>}><Chapter6LearningLibrary onBack={()=>navigate('course-home','calc2')}/></Suspense>}
 
       {view === 'fundamental-algebra' && (
         <Suspense fallback={<div className="lecture-loading" role="status">Preparing the Algebra review…</div>}>
@@ -296,7 +315,7 @@ function App() {
             onOpenUnitCircle={() => navigate('trig-unit-circle', null)}
             onOpenSixFunctions={() => navigate('trig-six-functions', null)}
             onOpenCofunctions={() => navigate('trig-cofunctions', null)}
-            onOpenModule={(id) => navigate(`trig-advanced-${id}`,null)}
+            onOpenModule={(id) => navigate(id==='hyperbolic'?'hyperbolic-study':`trig-advanced-${id}`,null)}
             onOpenPractice={() => navigate('trig-readiness-practice', null)}
           />
         </Suspense>
@@ -366,6 +385,7 @@ function App() {
         </Suspense>
       )}
       {view.startsWith('trig-advanced-')&&(()=>{const lessonId=view.replace('trig-advanced-',''),order=['pythagorean-identities','symmetry','graphs','periodicity','transformations','angle-identities','combined-sinusoid','inverse-trig','hyperbolic'],position=order.indexOf(lessonId);return <Suspense fallback={<div className="lecture-loading" role="status">Preparing the interactive trigonometry lesson…</div>}><AdvancedTrigLesson lessonId={lessonId} completed={reviewProgress.trigAdvanced} onCompletedChange={(value)=>updateProgress('trigAdvanced',value)} onOverview={()=>navigate('calc2-trig',null)} onHome={()=>navigate('home',null)} onPrevious={()=>navigate(position>0?`trig-advanced-${order[position-1]}`:'calc2-trig',null)} onNext={()=>navigate(position<order.length-1?`trig-advanced-${order[position+1]}`:'calc2-trig',null)}/></Suspense>})()}
+      {view==='hyperbolic-study'&&<Suspense fallback={<div className="lecture-loading" role="status">Preparing the complete Hyperbolic Functions lecture…</div>}><HyperbolicStudyLecture completed={reviewProgress.trigAdvanced} onCompletedChange={(value)=>updateProgress('trigAdvanced',value)} onOverview={()=>navigate('calc2-trig',null)} onHome={()=>navigate('home',null)}/></Suspense>}
       {view === 'calc2-limits' && (
         <Suspense fallback={<div className="lecture-loading" role="status">Preparing the limits review…</div>}>
           <LimitsReadinessReview
@@ -378,7 +398,8 @@ function App() {
       )}
       {view === 'calc2-derivatives' && (
         <Suspense fallback={<div className="lecture-loading" role="status">Preparing the derivatives review…</div>}>
-          <DerivativesReadinessReview
+          <Calculus1EditableReview
+            review={derivativesReview}
             completed={reviewProgress.derivatives}
             onCompletedChange={(value) => updateProgress('derivatives', value)}
             onReviewCenter={() => navigate('review-path', null)}
@@ -386,6 +407,9 @@ function App() {
           />
         </Suspense>
       )}
+      {view === 'calc2-continuity' && <Suspense fallback={<div className="lecture-loading" role="status">Preparing the continuity review…</div>}><Calculus1EditableReview review={continuityReview} completed={reviewProgress.continuity} onCompletedChange={(value)=>updateProgress('continuity',value)} onReviewCenter={()=>navigate('review-path',null)} onHome={()=>navigate('home',null)}/></Suspense>}
+      {view === 'calc2-derivative-applications' && <Suspense fallback={<div className="lecture-loading" role="status">Preparing derivative applications…</div>}><Calculus1EditableReview review={derivativeApplicationsReview} completed={reviewProgress.derivativeApplications} onCompletedChange={(value)=>updateProgress('derivativeApplications',value)} onReviewCenter={()=>navigate('review-path',null)} onHome={()=>navigate('home',null)}/></Suspense>}
+      {view === 'calc2-integrals' && <Suspense fallback={<div className="lecture-loading" role="status">Preparing integral foundations…</div>}><Calculus1EditableReview review={integralFoundationsReview} completed={reviewProgress.integrals} onCompletedChange={(value)=>updateProgress('integrals',value)} onReviewCenter={()=>navigate('review-path',null)} onHome={()=>navigate('home',null)}/></Suspense>}
       {view === 'calc2-exp-log' && (
         <Suspense fallback={<div className="lecture-loading" role="status">Preparing the exponential and logarithmic review…</div>}>
           <ExpLogReadinessReview
@@ -404,8 +428,8 @@ function App() {
           backLabel="Course Home"
           onOpenLecture={() => navigate('lecture-12-1')}
           onOpenJsonDemo={() => navigate('lecture-json')}
-          onOpenReview={() => navigate('review-path', null)}
-          reviewLabel="Open Fundamental Review"
+          onOpenReview={() => navigate('chapter-12-review-12-1', courseId || 'calc3')}
+          reviewLabel="Open complete Chapter 12 review"
         />
       )}
       {view === 'lecture-12-1' && (
@@ -424,9 +448,14 @@ function App() {
           />
         </Suspense>
       )}
+      {view.startsWith('chapter-12-review-')&&(
+        <Suspense fallback={<div className="lecture-loading" role="status">Preparing the complete Chapter 12 review…</div>}>
+          <Chapter12Review sectionId={view.replace('chapter-12-review-','')} onBack={()=>navigate('chapter',courseId||'calc3')} onOpenSection={(id)=>navigate(`chapter-12-review-${id}`,courseId||'calc3')}/>
+        </Suspense>
+      )}
       {view === 'instructor' && (
         <Suspense fallback={<div className="lecture-loading" role="status">Loading Instructor Lectures…</div>}>
-          <InstructorHome onHome={() => navigate('home', null)} onJoin={() => { window.location.hash = '#/instructor/mock/join' }} onOpenLecture={(id, mode) => { setInstructorLecture({ id, mode }); window.history.pushState(null, '', `#/instructor/lectures/${id}/${mode}`); setView('instructor-lecture'); scrollAndFocusMain() }} />
+          <InstructorHome onHome={() => navigate('home', null)} />
         </Suspense>
       )}
       {view === 'instructor-lecture' && (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import supabase from '../../lib/supabaseClient'
 import QRCode from 'react-qr-code'
 
@@ -8,7 +8,6 @@ function makeJoinCode() {
 
 export default function LiveInstructor({ lectureId = 'real-numbers' }) {
   const [session, setSession] = useState(null)
-  const [joinCode, setJoinCode] = useState('')
   const [sub, setSub] = useState(null)
 
   useEffect(() => {
@@ -19,7 +18,6 @@ export default function LiveInstructor({ lectureId = 'real-numbers' }) {
 
   const startSession = async () => {
     const code = makeJoinCode()
-    setJoinCode(code)
     // Create a live_sessions row. Schema must exist in Supabase for prototype.
     const { data, error } = await supabase.from('live_sessions').insert([{
       lecture_id: lectureId,
@@ -46,7 +44,6 @@ export default function LiveInstructor({ lectureId = 'real-numbers' }) {
     if (!session) return
     await supabase.from('live_sessions').update({ status: 'ended' }).eq('id', session.id)
     setSession(null)
-    setJoinCode('')
     if (sub && sub.unsubscribe) sub.unsubscribe()
     setSub(null)
   }
@@ -89,7 +86,7 @@ export default function LiveInstructor({ lectureId = 'real-numbers' }) {
         <div>
           <p>Session ID: {session.id}</p>
           <p>Join code: <strong>{session.join_code}</strong></p>
-          <div style={{ width: 150 }}><QRCode value={window.location.origin + `#/instructor/join/${session.join_code}`} size={150} /></div>
+          <div style={{ width: 150 }}><QRCode value={`${window.location.origin}/#/student?code=${encodeURIComponent(session.join_code)}`} size={150} /></div>
           <p>Slide: {session.current_slide_index}</p>
 
           <div className="instructor-controls">

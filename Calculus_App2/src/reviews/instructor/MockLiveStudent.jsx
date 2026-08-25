@@ -1,11 +1,24 @@
 import { useEffect, useState } from 'react'
 import mockLive from '../../lib/mockLive'
+import { MathDisplay } from '../../components/MathDisplay'
+import { getLecture } from '../../instructor/data/lectureCatalog'
+import { ensureElements } from '../../instructor/services/lectureEditorService'
+import SlideCanvas from '../../instructor/components/SlideCanvas'
+import '../../instructor/styles/instructor.css'
 
 export default function MockLiveStudent({ joinCodeProp }) {
   const [code, setCode] = useState(joinCodeProp || '')
-  const [trueName, setTrueName] = useState('')
-  const [displayMode, setDisplayMode] = useState('anonymous')
-  const [displayName, setDisplayName] = useState('')
+  const [savedProfile] = useState(() => {
+    if (typeof window === 'undefined') return null
+    try {
+      return JSON.parse(window.localStorage.getItem('interactive-calculus:student-profile') || 'null')
+    } catch {
+      return null
+    }
+  })
+  const [trueName, setTrueName] = useState(savedProfile?.trueName || '')
+  const [displayMode, setDisplayMode] = useState(savedProfile?.displayMode || 'anonymous')
+  const [displayName, setDisplayName] = useState(savedProfile?.displayName || '')
   const [session, setSession] = useState(null)
   const [question, setQuestion] = useState(null)
   const [selected, setSelected] = useState(null)
@@ -13,10 +26,13 @@ export default function MockLiveStudent({ joinCodeProp }) {
   const [submitted, setSubmitted] = useState(false)
   const [joinError, setJoinError] = useState('')
   const [answerError, setAnswerError] = useState('')
+  const [pointsAwarded, setPointsAwarded] = useState(null)
+  const [secondsRemaining,setSecondsRemaining]=useState(null)
   const [comprehensionStatus, setComprehensionStatus] = useState('')
   const [confidence, setConfidence] = useState(3)
   const [muddy, setMuddy] = useState('')
   const [remainingQ, setRemainingQ] = useState('')
+  const [selfPacedSlide,setSelfPacedSlide]=useState(0)
   const [clientId] = useState(() => {
     const fallback = `student-${Date.now()}-${Math.random().toString(36).slice(2)}`
     if (typeof window === 'undefined') return fallback
@@ -30,8 +46,26 @@ export default function MockLiveStudent({ joinCodeProp }) {
       return fallback
     }
   })
+  useEffect(()=>{
+    const calculate=()=>setSecondsRemaining(question?.expires_at?Math.max(0,Math.ceil((new Date(question.expires_at).getTime()-Date.now())/1000)):null)
+    calculate()
+    if(!question?.expires_at||question.status!=='open')return undefined
+    const timer=setInterval(calculate,250)
+    return()=>clearInterval(timer)
+  },[question?.id,question?.expires_at,question?.status])
 
   const sessionId = session?.id
+  const selfPacedSlides=session?.self_paced?getLecture(session.lecture_id).slides.map(ensureElements):[]
+  const currentSelfPacedSlide=selfPacedSlides[selfPacedSlide]
+
+  const goToSelfPacedSlide=(nextIndex)=>{
+    const safeIndex=Math.max(0,Math.min(selfPacedSlides.length-1,nextIndex)),nextSlide=selfPacedSlides[safeIndex]
+    setSelfPacedSlide(safeIndex);setAnswerError('');setPointsAwarded(null)
+    if(!nextSlide?.question){setQuestion(null);setSelected(null);setSubmitted(false);return}
+    const next=mockLive.openSelfPacedQuestion(session.id,{...nextSlide.question,id:nextSlide.id,timer:null,scoring:nextSlide.question.scoring==='speed'?undefined:nextSlide.question.scoring})
+    const prior=session.own_responses?.find(response=>String(response.question_id)===String(next?.id))
+    setQuestion(next);setSelected(prior?.answer??null);setSubmitted(Boolean(prior));setPointsAwarded(prior?.points??null)
+  }
 
   useEffect(() => {
     let unsubscribeSession
@@ -49,6 +83,7 @@ export default function MockLiveStudent({ joinCodeProp }) {
           setSelected(null)
           setSubmitted(false)
           setAnswerError('')
+          setPointsAwarded(null)
         }
       })
     }
@@ -75,6 +110,11 @@ export default function MockLiveStudent({ joinCodeProp }) {
     }
 
     setJoinError('')
+    try {
+      window.localStorage.setItem('interactive-calculus:student-profile', JSON.stringify({ trueName:identity, displayMode, displayName }))
+    } catch {
+      // Access still works if browser storage is unavailable.
+    }
     setSession({ ...joinedSession })
     setParticipant(
       joinedSession.participants.find((item) => item.external_id === clientId) || null,
@@ -98,6 +138,7 @@ export default function MockLiveStudent({ joinCodeProp }) {
     })
     if (result) {
       setSubmitted(true)
+      setPointsAwarded(result.points)
       setAnswerError('')
     } else {
       setAnswerError('Your response was not accepted. The question may be closed or your attempt may already be recorded.')
@@ -122,8 +163,8 @@ export default function MockLiveStudent({ joinCodeProp }) {
     <div className="page live-student">
       {!session && (
         <form onSubmit={join}>
-          <h2>Join Live Class</h2>
-          <p>Your instructor can identify your participation privately. You choose what classmates would see.</p>
+          <h2>Enter Your Class</h2>
+          <p>A valid class code gives you immediate access. No instructor approval is required.</p>
 
           <label htmlFor="live-student-name">Your enrolled name (instructor only)</label>
           <input
@@ -154,7 +195,7 @@ export default function MockLiveStudent({ joinCodeProp }) {
           />
 
           {joinError && <p role="alert">{joinError}</p>}
-          <button type="submit">Join class</button>
+          <button type="submit">Enter student dashboard</button>
         </form>
       )}
 
@@ -172,30 +213,22 @@ export default function MockLiveStudent({ joinCodeProp }) {
       {session && session.status !== 'ended' && (
         <div>
           <h3>You&apos;re in — {session.lecture_id}</h3>
+          {session.self_paced&&<section className="self-paced-student-workspace"><header><div><strong>Self-Paced Lecture</strong><span>Slide {selfPacedSlide+1} of {selfPacedSlides.length}</span></div><nav aria-label="Self-paced slide navigation"><button onClick={()=>goToSelfPacedSlide(selfPacedSlide-1)} disabled={selfPacedSlide===0}>Previous</button><button onClick={()=>goToSelfPacedSlide(selfPacedSlide+1)} disabled={selfPacedSlide>=selfPacedSlides.length-1}>Next</button></nav></header><div className="self-paced-slide-frame">{currentSelfPacedSlide&&<SlideCanvas slide={currentSelfPacedSlide} revealCount={99}/>}</div></section>}
           {participant?.display_name && <section className="student-display-card"><span>You are displaying as</span><strong>{participant.display_name}</strong><div className="display-change-controls"><select value={displayMode} onChange={(event)=>setDisplayMode(event.target.value)}><option value="firstName">My first name</option><option value="alias">Choose a display name</option><option value="anonymous">Anonymous</option></select>{displayMode==='alias'&&<input value={displayName} onChange={(event)=>setDisplayName(event.target.value)} maxLength={24} placeholder="New display name"/>}<button onClick={changeDisplay}>Change display name</button></div>{joinError&&<p role="alert">{joinError}</p>}</section>}
-          {!question?.id && (
+          {!session.self_paced&&!question?.id && (
             <p>Waiting for the next question... (Slide {session.current_slide_index})</p>
           )}
 
           {question?.status === 'open' && !submitted && (
             <div className="live-question">
-              <h4>{question.prompt || question.text}</h4>
+              {secondsRemaining!=null&&<div className={`student-challenge-countdown ${secondsRemaining<=10?'ending':''}`}><strong>{secondsRemaining}</strong> seconds remaining</div>}
+              <h4>{question.prompt || question.text}{question.mathPrompt&&<MathDisplay>{question.mathPrompt}</MathDisplay>}</h4>
               {['mcq', 'multiple-choice', 'true-false'].includes(question.type) && (
-                <ul>
+                <div className="student-quiz-grid" role="radiogroup" aria-label="Answer choices">
                   {question.options?.map((option, index) => (
-                    <li key={`${question.id}-${index}`}>
-                      <label>
-                        <input
-                          type="radio"
-                          name="mcq"
-                          checked={selected === index}
-                          onChange={() => setSelected(index)}
-                        />{' '}
-                        {option}
-                      </label>
-                    </li>
+                    <button type="button" role="radio" aria-checked={selected===index} className={selected===index?'selected':''} onClick={()=>setSelected(index)} key={`${question.id}-${question.choiceIds?.[index]||index}`}><b>{String.fromCharCode(65+index)}</b><span>{question.optionMath?.[index] ? <MathDisplay>{question.optionMath[index]}</MathDisplay> : option}</span></button>
                   ))}
-                </ul>
+                </div>
               )}
               {['numerical', 'mathematical-expression', 'short-answer', 'conceptual'].includes(question.type) && (
                 <input
@@ -204,6 +237,9 @@ export default function MockLiveStudent({ joinCodeProp }) {
                   inputMode={question.type === 'numerical' ? 'decimal' : 'text'}
                   placeholder="Enter your response"
                 />
+              )}
+              {question.type === 'multiple-select' && (
+                <ul>{question.options?.map((option,index)=><li key={`${question.id}-${index}`}><label><input type="checkbox" checked={Array.isArray(selected)&&selected.includes(index)} onChange={()=>setSelected(values=>{const current=Array.isArray(values)?values:[];return current.includes(index)?current.filter(value=>value!==index):[...current,index].sort((a,b)=>a-b)})}/>{' '}{option}</label></li>)}</ul>
               )}
               {question.type === 'confidence' && (
                 <div className="confidence-buttons">
@@ -227,6 +263,7 @@ export default function MockLiveStudent({ joinCodeProp }) {
           {question?.id && submitted && question.status === 'open' && (
             <div className="answer-submitted">
               <h4>Answer submitted</h4>
+              {question.scoring === 'speed' && <p>Your score will be shown after the instructor reveals the answer.</p>}
               <p>Waiting for the instructor...</p>
             </div>
           )}
@@ -235,8 +272,9 @@ export default function MockLiveStudent({ joinCodeProp }) {
             <div className="answer-submitted">
               <h4>Question {question.status.replace('-', ' ')}</h4>
               {question.status === 'answer-revealed' && (
-                <p>The instructor has revealed the answer.</p>
+                <><p>The instructor has revealed the answer.{question.scoring === 'speed' && pointsAwarded != null ? ` You earned ${pointsAwarded} points.` : ''}</p>{question.solution?.correctAnswer&&<section className="student-quiz-solution"><strong>{question.solution.correctAnswer}</strong>{question.solution.steps?.map((step,index)=><MathDisplay key={index}>{step}</MathDisplay>)}<p>{question.solution.explanation}</p></section>}</>
               )}
+              {['results','answer-revealed'].includes(question.status)&&session.public_question_leaderboard?.length>0&&<section className="student-top-five"><h4>Fastest correct answers</h4><ol>{session.public_question_leaderboard.map(row=><li key={`${row.rank}-${row.displayName}`}><b>{row.rank}</b><span>{row.displayName}</span><strong>+{row.points}</strong></li>)}</ol></section>}
             </div>
           )}
 
