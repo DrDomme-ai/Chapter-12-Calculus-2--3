@@ -20,6 +20,10 @@ const smileByLecture={
 }
 
 const exitPromptsByLecture={
+  'chapter-12-1':['How do three coordinates locate a point in space?','What does setting one coordinate equal to zero produce in three-dimensional space?','Why does a missing variable create a cylindrical surface?','How does the distance formula lead to the standard equation of a sphere?'],
+  'chapter-12-2':['What is the geometric difference between a point and a vector?','How do you construct the displacement vector from A to B?','Why does dividing a nonzero vector by its magnitude produce a unit vector?','How can vector components describe a physical velocity or force?'],
+  'chapter-12-5':['What information determines a line in space?','How does a normal vector determine the orientation of a plane?','How can two plane normals determine the direction of their intersection line?','Why is point-to-plane distance a projection onto the normal direction?'],
+  'chapter-12-6':['How does a missing variable reveal the direction of a cylinder?','How do traces help identify a three-dimensional surface?','Which sign patterns distinguish ellipsoids, hyperboloids, and cones?','How can several two-dimensional traces reconstruct a quadric surface?'],
   'inverse-trigonometric-functions':['Why must sine be restricted before arcsine is defined as a function?','What is the principal range of arcsine?','Differentiate y=arctan(3x).','Why is sin⁻¹x not the same as csc x?'],
   'hyperbolic-functions':['State the fundamental identity relating cosh x and sinh x.','Which hyperbolic function is even, and why?','Why must cosh be restricted before defining its inverse?','What is the derivative of sinh x?'],
   limits:['Why does the form 0/0 not determine a limit?','When can l’Hospital’s Rule be applied directly?','What must be done with a 0·∞ form before using the rule?','Why are logarithms useful for a 1^∞ power limit?'],
@@ -34,7 +38,18 @@ const exitPromptsByLecture={
 
 const slide=(id,type,title,presentationContent,options={})=>({id,type,title,presentationContent,presenterNotes:[],studentNotes:[],revealSteps:[],layoutMode:'slide',theme:'classic-math',level:'essential',...options})
 
+const chapter124ExitChecks=[
+  {options:['It equals the parallelogram area.','It equals the parallelogram perimeter.','It equals the dot product.','It always equals 1.'],correctAnswer:0,explanation:'The cross-product magnitude is ||a||||b|| sin(theta), which is base times perpendicular height: the parallelogram area.'},
+  {options:['A triangle occupies half of the parallelogram formed by the same two vectors.','A triangle always has half the perimeter.','The cross product already divides by 2.','The vectors must be perpendicular.'],correctAnswer:0,explanation:'The diagonal divides the parallelogram into two congruent triangles, so the triangle area is one half of ||a x b||.'},
+  {options:['Take the cross product of two nonparallel direction vectors in the plane.','Add the two direction vectors.','Take their dot product.','Divide one direction vector by the other.'],correctAnswer:0,explanation:'The cross product of two nonparallel in-plane directions is perpendicular to both and therefore normal to the plane.'},
+  {options:['||tau||=||r||||F|| sin(theta), so torque is largest at 90 degrees.','Torque is largest at 0 degrees.','The angle has no effect on torque.','Torque always equals ||r||||F||.'],correctAnswer:0,explanation:'Only the component of force perpendicular to the lever arm produces rotation; sin(theta) is largest at 90 degrees.'},
+]
+
 function exitQuestion(lecture,index,kind,prompt){
+  if(lecture.id==='chapter-12-4'){
+    const configured=chapter124ExitChecks[index-1]
+    return slide(`${lecture.id}-master-exit-${index}`,'live-question',`Exit Check ${index}: ${kind}`,[content('eyebrow','EXIT CHECK · IF TIME ALLOWS'),content('text',prompt)],{question:{id:`${lecture.id}-master-exit-${index}`,type:'multiple-choice',prompt,options:configured.options,correctAnswer:configured.correctAnswer,explanation:configured.explanation,timer:60,pointsPossible:1000,scoring:'speed',topic:`${lecture.title} Exit Check`,category:'exit-check',graded:true,privacy:'aggregate'},presenterNotes:[{type:'answer',title:'Correct answer and debrief',content:configured.explanation}]})
+  }
   return slide(`${lecture.id}-master-exit-${index}`,'live-question',`Exit Check ${index}: ${kind}`,[content('eyebrow','EXIT CHECK · IF TIME ALLOWS'),content('text',prompt)],{question:{type:'short-answer',prompt,topic:`${lecture.title} Exit Check`,category:'exit-check',graded:false,privacy:'aggregate'}})
 }
 
@@ -56,6 +71,24 @@ function addLiveQuizSequences(slides){
     result.push(slide(`${item.id}-solution`,'solution',`${item.title}: Solution`,[content('eyebrow','CORRECT ANSWER'),content('callout',answer),content('text',quizSolution.explanation)],{liveQuizView:'solution',sourceQuestionId:item.id,quizSolution,solutionFor:item.id,masterRequirement:'question-solution'}));
   }
   return result
+}
+
+const chapter124FormatTargets=new Set(['chapter-12-1','chapter-12-2','chapter-12-3','chapter-12-5','chapter-12-6'])
+const choiceSlug=value=>String(value||'choice').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,36)||'choice'
+
+function applyChapter124LiveFormat(lecture,slides){
+  // Section 12.4 has a carefully authored custom presentation and must remain
+  // exactly in its native layout. The shared format is for the other sections.
+  if(!chapter124FormatTargets.has(lecture.id))return slides
+  return slides.map((item,index)=>{
+    const question=item.question
+    const choices=question?.choices||question?.options||[]
+    const choiceIds=question?.choiceIds||choices.map((choice,choiceIndex)=>choice?.id||`${choiceSlug(item.id)}-${String.fromCharCode(97+choiceIndex)}`)
+    const notes=[...(item.presenterNotes||[])]
+    if(!notes.some(entry=>entry.type==='teaching'))notes.push({type:'teaching',title:'Teaching purpose',content:`Use this slide to develop ${item.title} through explanation, visualization, or guided student reasoning.`})
+    if(index<slides.length-1&&!notes.some(entry=>entry.type==='transition'))notes.push({type:'transition',title:'Transition',content:`Connect this idea directly to ${slides[index+1].title}.`})
+    return {...item,layoutMode:'slide',theme:item.theme||'classic-math',chapter12LiveFormat:'12.4',classroomFontMinimumPt:18,presenterNotes:notes,...(question?{question:{...question,timer:question.type==='multiple-choice'?(question.timer??60):question.timer,pointsPossible:question.type==='multiple-choice'?(question.pointsPossible??1000):question.pointsPossible,scoring:question.type==='multiple-choice'?(question.scoring||'speed'):question.scoring,...(choices.length?{choiceIds}:{})}}:{})}
+  })
 }
 
 const chapter12Retrievals={
@@ -179,5 +212,6 @@ export function applyLectureRequirements(lecture){
   const existingIds=new Set(instructionalSlides.map(item=>item.id)),welcome=inherited[0],removed=new Set(lecture.removedSlideIds||[])
   const trailingRequirements=inherited.slice(1).filter(item=>lecture.id!=='chapter-12-4'||!['spark','smile'].includes(item.masterRequirement))
   const assembled=[...(existingIds.has(welcome.id)?[]:[welcome]),...retrievalSlides.filter(item=>!existingIds.has(item.id)),...instructionalSlides,...additions.filter(item=>!existingIds.has(item.id)),...trailingRequirements.filter(item=>!existingIds.has(item.id))]
-  return {...lecture,masterRequirementsApplied:true,slides:assembled.filter(item=>!removed.has(item.id))}
+  const preserved=assembled.filter(item=>!removed.has(item.id))
+  return {...lecture,masterRequirementsApplied:true,...(chapter124FormatTargets.has(lecture.id)?{liveFormat:'12.4'}:{}),slides:applyChapter124LiveFormat(lecture,preserved)}
 }

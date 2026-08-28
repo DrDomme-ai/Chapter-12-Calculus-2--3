@@ -455,7 +455,16 @@ function App() {
       )}
       {view === 'instructor' && (
         <Suspense fallback={<div className="lecture-loading" role="status">Loading Instructor Lectures…</div>}>
-          <InstructorHome onHome={() => navigate('home', null)} />
+          <InstructorHome
+            onHome={() => navigate('home', null)}
+            onJoin={() => { window.location.hash = '#/student' }}
+            onOpenLecture={(id, mode) => {
+              setInstructorLecture({ id, mode })
+              window.history.pushState(null, '', `#/instructor/lectures/${id}/${mode}`)
+              setView('instructor-lecture')
+              scrollAndFocusMain()
+            }}
+          />
         </Suspense>
       )}
       {view === 'instructor-lecture' && (
